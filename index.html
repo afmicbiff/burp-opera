@@ -113,7 +113,9 @@ button.go.hold .lbl { position: relative; }
 #title.resuming .how1 { display: none; }
 button.go.play-btn { width: min(360px, 86vw); font-size: clamp(1.5rem, 6.5vw, 2rem); padding-block: 18px; }
 @media (prefers-reduced-motion: no-preference) { button.go.play-btn { animation: playbob 2.4s ease-in-out infinite; } @keyframes playbob { 50% { transform: translateY(-3px); } } }
-.title-row { display: flex; gap: 10px; width: min(360px, 86vw); }
+.title-row { display: flex; gap: 8px; width: min(440px, 92vw); }
+.title-row .chip-pick { font-size: .85rem; padding-inline: 4px; }
+.title-row .chip-pick select { font-size: .85rem; }
 .chip-pick { flex: 1 1 0; min-width: 0; position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; font-family: var(--hud); color: var(--ink);
   background: rgba(26,11,46,.65); border: 2px solid var(--tang); border-radius: 14px; padding: 8px 8px 10px; cursor: pointer; font-size: .95rem; }
 .chip-pick > span { font-size: .65rem; color: var(--tang); letter-spacing: .08em; text-transform: uppercase; }
@@ -238,6 +240,7 @@ button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
     <button class="go play-btn" id="play" type="button">▶ Play</button>
     <div class="title-row">
       <label class="chip-pick" for="modePick"><span>Mode</span><select id="modePick"></select></label>
+      <label class="chip-pick" for="viewPick"><span>View</span><select id="viewPick"><option value="3d">3D</option><option value="2d">Classic</option><option value="8bit">8-bit</option></select></label>
       <button class="chip-pick wr-btn" id="wardrobeBtn" type="button" aria-label="Wardrobe: change your frog, hat, cast and view"><span>Dress up</span><b>🎩 Wardrobe</b><i class="dot" id="wrDot" hidden></i></button>
     </div>
   </div>
@@ -286,7 +289,6 @@ button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
         <select id="frogPick" aria-hidden="true" tabindex="-1"></select>
         <select id="hatPick" aria-hidden="true" tabindex="-1"></select>
         <select id="stylePick" aria-hidden="true" tabindex="-1"></select>
-        <select id="viewPick" aria-hidden="true" tabindex="-1"><option value="3d">3D stage</option><option value="2d">Classic 2D</option><option value="8bit">8-bit 2D</option></select>
         <select id="popStyle" aria-hidden="true" tabindex="-1"></select>
         <select id="popFrog" aria-hidden="true" tabindex="-1"></select>
         <select id="popHat" aria-hidden="true" tabindex="-1"></select>
@@ -4066,7 +4068,7 @@ for (const g of [
   }
 }
 // every drop-down that holds unlockable things
-const VIEWS = [['3D stage', '3d'], ['Classic 2D', '2d'], ['8-bit 2D', '8bit']];
+const VIEWS = [['3D', '3d'], ['Classic', '2d'], ['8-bit', '8bit']];
 const KIND = { frog: 'frog', hat: 'hat', set: 'cast', view: 'view' };
 const PICKS = [
   { cat: 'frog', ids: ['frogPick', 'popFrog'], list: () => FROG_COLORS },
@@ -4090,7 +4092,7 @@ function refreshPicks() {
       if (p.cat === 'view' && o.value === '3d' && g3failed) { o.disabled = true; o.textContent = '3D (not available here)'; continue; }
       const lv = unlockLevel(p.cat, o.value);
       o.disabled = !isUnlocked(p.cat, o.value);
-      o.textContent = o.disabled ? it[0] + ' · reach level ' + lv : isNew(p.cat, o.value) ? '★ NEW · ' + it[0] : it[0];
+      o.textContent = o.disabled ? it[0] + (p.cat === 'view' ? ' 🔒 Lv ' : ' · reach level ') + lv : isNew(p.cat, o.value) ? '★ NEW · ' + it[0] : it[0];
       if (isNew(p.cat, o.value)) fresh = true;
     }
     for (const id of p.ids) $(id).classList.toggle('has-new', fresh);
