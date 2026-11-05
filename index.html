@@ -154,21 +154,22 @@ body.pixel .dev-sec h2, body.pixel .dev-row .chip-btn, body.pixel .dev-lv { font
 .tr-grid { list-style: none; margin: 0; padding: 4px; width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(130px, 40%), 1fr)); gap: 8px; max-height: min(58vh, 620px); overflow-y: auto; box-sizing: border-box; }
 .tr-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 8px 10px; border-radius: 14px; background: rgba(59,15,79,.6); border: 2px solid rgba(255,255,255,.1); text-align: center; min-width: 0; }
 .tr-card svg { width: 54px; height: 54px; }
-.tr-card.got { border-color: #ffd21f; background: radial-gradient(ellipse at 50% 20%, rgba(255,210,31,.28), rgba(59,15,79,.7) 70%); }
-.tr-card.got svg { filter: drop-shadow(0 0 10px rgba(255,210,31,.75)); }
+.tr-card.got { border-color: #d4a72c; background: radial-gradient(ellipse at 50% 12%, rgba(255,210,31,.14), rgba(40,12,58,.92) 60%); }
+.tr-card.got svg { filter: drop-shadow(0 0 6px rgba(255,210,31,.45)); }
 .tr-card:not(.got) svg { filter: grayscale(1) brightness(.45); opacity: .7; }
 .tr-card.fresh { box-shadow: 0 0 0 3px var(--cyan), 0 0 18px var(--cyan); }
-.tr-name { font-family: var(--display); font-size: .82rem; color: var(--ink); line-height: 1.15; }
-.tr-card.got .tr-name { color: #ffd21f; }
-.tr-desc { font-family: var(--mono); font-size: .72rem; color: var(--dim); line-height: 1.3; }
+.tr-name { font-family: "Bungee", Impact, system-ui, sans-serif; font-size: .85rem; color: #ffffff; line-height: 1.2; letter-spacing: .02em; }
+.tr-card:not(.got) .tr-name { color: #d9c8e4; }
+.tr-desc { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: .85rem; font-weight: 500; color: #f3e8fa; line-height: 1.35; }
+.tr-card:not(.got) .tr-desc { color: #cdbad9; }
 .tr-prog { width: 80%; height: 6px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 2px; }
 .tr-prog i { display: block; height: 100%; background: var(--cyan); }
-.tr-num { font-family: var(--mono); font-size: .66rem; color: var(--cyan); font-variant-numeric: tabular-nums; }
-.tr-date { font-family: var(--mono); font-size: .66rem; color: #ffd21f; }
+.tr-num { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: .75rem; font-weight: 600; color: var(--cyan); font-variant-numeric: tabular-nums; }
+.tr-date { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: .75rem; font-weight: 600; color: #e9c35a; }
 .tr-new { position: absolute; top: 6px; right: 6px; font-family: var(--display); font-size: .6rem; background: var(--cyan); color: var(--plum); border-radius: 99px; padding: 2px 6px; }
 body.pixel .tr-card, body.pixel .tr-bar, body.pixel .tr-prog { border-radius: 0; }
-body.pixel .tr-name { font-size: .55rem; line-height: 1.6; }
-body.pixel .tr-desc, body.pixel .tr-date, body.pixel .tr-num { font-size: .45rem; line-height: 1.7; }
+body.pixel .tr-name { font-family: "Press Start 2P", monospace; font-size: .55rem; line-height: 1.6; }
+body.pixel .tr-desc { font-size: .8rem; line-height: 1.35; }
 body.pixel .tr-card svg { width: 40px; height: 40px; }
 body.pixel .tr-count { font-size: 1rem; }
 .corner-btn { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); z-index: 2; }
