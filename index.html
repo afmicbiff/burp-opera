@@ -130,6 +130,20 @@ button.go.play-btn { width: min(360px, 86vw); font-size: clamp(1.5rem, 6.5vw, 2r
 .tr-line:empty { display: none; }
 .tr-line { color: #ffd21f; }
 #trPop { z-index: 6; }
+#devPop { z-index: 7; }
+.dev-btn { position: absolute; z-index: 5; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); border-color: #ffd21f; color: #ffd21f; background: rgba(26,11,46,.75); }
+.dev-pop { max-width: 640px; text-align: left; align-items: stretch; max-height: calc(100% - 8px); overflow-y: auto; }
+.dev-pop .tag, .dev-pop > .small { text-align: center; }
+.dev-sec { display: flex; flex-direction: column; gap: 8px; }
+.dev-sec h2 { font-family: var(--hud); font-weight: 400; font-size: .8rem; color: var(--tang); letter-spacing: .08em; text-transform: uppercase; margin: 0; }
+.dev-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.dev-row .chip-btn { font-size: .78rem; }
+.dev-tog[aria-pressed="true"] { background: var(--frog); color: var(--plum); border-color: var(--frog); }
+.dev-tog[aria-pressed="true"]::before { content: '✓ '; }
+.dev-lv { font-family: var(--hud); font-size: .8rem; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+.dev-lv input { width: 4.5em; font-family: var(--hud); font-size: .9rem; color: var(--ink); background: var(--plum); border: 2px solid var(--tang); border-radius: 8px; padding: 4px 6px; }
+.dev-danger { border-color: #ff6b6b; color: #ff9a9a; }
+body.pixel .dev-sec h2, body.pixel .dev-row .chip-btn, body.pixel .dev-lv { font-size: .55rem; }
 .tr-pop { max-width: 760px; gap: 10px; }
 .tr-count { font-family: var(--display); color: #ffd21f; font-size: 1.6rem; margin: 0; font-variant-numeric: tabular-nums; }
 .tr-count b { font-weight: 400; color: var(--ink); }
@@ -207,6 +221,8 @@ button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
     <button id="menuBtn" class="chip-btn" type="button" hidden>Menu</button>
     <button id="mute" class="chip-btn" type="button">Sound on</button>
   </div>
+
+  <button id="devBtn" class="chip-btn dev-btn" type="button" hidden>🛠 Dev</button>
 
   <div class="overlay" id="title">
     <div class="corner-btns">
@@ -334,6 +350,51 @@ button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
       </div>
       <ul class="tr-grid" id="trGrid"></ul>
       <button class="go alt" id="trClose" type="button">Close</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="devPop" hidden role="dialog" aria-modal="true" aria-labelledby="devTitle">
+    <div class="pop dev-pop">
+      <p class="tag" id="devTitle">🛠 Dev tools</p>
+      <p class="small">For building and testing. While dev tools are on, scores aren't posted to the world boards, trophies aren't won for real, and your level progress isn't saved.</p>
+      <section class="dev-sec"><h2>Switches</h2>
+        <div class="dev-row">
+          <button class="chip-btn dev-tog" type="button" data-k="all" aria-pressed="false">Unlock everything</button>
+          <button class="chip-btn dev-tog" type="button" data-k="god" aria-pressed="false">Never lose (∞ lives)</button>
+          <button class="chip-btn dev-tog" type="button" data-k="trAll" aria-pressed="false">Show all trophies as won</button>
+        </div>
+      </section>
+      <section class="dev-sec"><h2>Jump in</h2>
+        <div class="dev-row">
+          <label class="dev-lv" for="devLevel">Level <input id="devLevel" type="number" min="1" max="100" value="10" inputmode="numeric"></label>
+          <button class="chip-btn" type="button" id="devGoLevel">▶ Play from this level</button>
+          <button class="chip-btn" type="button" id="devBoss">👹 Boss fight now</button>
+          <button class="chip-btn" type="button" id="devFinal">👑 Final boss</button>
+        </div>
+      </section>
+      <section class="dev-sec"><h2>Power-ups</h2><div class="dev-row" id="devPows"></div></section>
+      <section class="dev-sec"><h2>Chaos events</h2><div class="dev-row" id="devChaos"></div></section>
+      <section class="dev-sec"><h2>Show me</h2>
+        <div class="dev-row">
+          <button class="chip-btn" type="button" id="devTeach">HOLD / LET GO hint</button>
+          <button class="chip-btn" type="button" id="devCan">"Burp me" soda can</button>
+          <button class="chip-btn" type="button" id="devRed">Red circles</button>
+          <button class="chip-btn" type="button" id="devToast">Trophy banner</button>
+          <button class="chip-btn" type="button" id="devOver">Curtain call</button>
+          <button class="chip-btn" type="button" id="devWin">Winning curtain call</button>
+          <button class="chip-btn" type="button" id="devTrophies">Trophy room</button>
+          <button class="chip-btn" type="button" id="devBoards">Leaderboards</button>
+          <button class="chip-btn" type="button" id="devLock">Parent lock</button>
+        </div>
+      </section>
+      <section class="dev-sec"><h2>Start over</h2>
+        <div class="dev-row">
+          <button class="chip-btn dev-danger" type="button" id="devReset">Erase my progress…</button>
+          <button class="chip-btn dev-danger" type="button" id="devResetYes" hidden>Yes, erase levels, trophies and scores</button>
+          <button class="chip-btn" type="button" id="devOff">Turn dev tools off</button>
+        </div>
+      </section>
+      <button class="go alt" id="devClose" type="button">Close</button>
     </div>
   </div>
 
@@ -540,6 +601,7 @@ addEventListener('keydown', e => {
   if (!$('iniPop').hidden) { if (e.code === 'Escape') $('iniSkip').click(); if (e.code === 'Enter') $('iniSave').click(); return; }
   if (!$('lbPop').hidden) { if (e.code === 'Escape') $('lbClose').click(); return; }
   if (!$('lockPop').hidden) { if (e.code === 'Escape') $('lockCancel').click(); return; }
+  if (!$('devPop').hidden) { if (e.code === 'Escape') closeDev(); return; }
   if (!$('trPop').hidden) { if (e.code === 'Escape') closeTrophies(); return; }
   if (!$('frogPop').hidden) { if (e.code === 'Escape') closeLook(); return; }
   if ((e.code === 'KeyP' || e.code === 'Escape') && mode === 'play' && !inMenu) { e.preventDefault(); pauseGame(!paused); return; }
@@ -594,6 +656,7 @@ function start() {
   if (M.daily) S.banner.top = "Today's challenge · " + new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   countCastPlay(); paused = false; inMenu = false;
   S.teach = taught ? 0 : 5;
+  if (DEV.on && DEV.god) S.lives = Infinity;
   S.view = view8 ? '8bit' : view3d ? '3d' : '2d'; S.won = false;
   ST.games++; if (!ST.modes.includes(modeKey)) ST.modes.push(modeKey); saveStats();
   checkTrophies();
@@ -1815,7 +1878,15 @@ let bestLevel = 1; // the highest level this player has ever reached, in any mod
 try { const v = Math.floor(Number(localStorage.getItem('burpOperaBestLevel'))); if (Number.isFinite(v) && v > 1) bestLevel = Math.min(v, 1000); } catch {}
 try { const u = JSON.parse(localStorage.getItem('burpOperaUnlocks') || '[]'); if (Array.isArray(u) && u.includes('crown')) bestLevel = Math.max(bestLevel, 42); } catch {} // crowns earned before this system
 const unlockLevel = (cat, v) => UNLOCK_AT[cat + ':' + v] || 1;
-const isUnlocked = (cat, v) => unlockLevel(cat, v) <= bestLevel;
+// dev tools: opened with #dev on the link or five quick taps on the title; settings stay on this device only
+const DEV = { on: false, all: false, god: false, trAll: false };
+try {
+  const d = JSON.parse(localStorage.getItem('burpOperaDev') || 'null');
+  if (d && d.on === true) { DEV.on = true; DEV.all = d.all === true; DEV.god = d.god === true; DEV.trAll = d.trAll === true; }
+} catch {}
+if (window.location.hash === '#dev') DEV.on = true;
+const realUnlocked = (cat, v) => unlockLevel(cat, v) <= bestLevel;
+const isUnlocked = (cat, v) => (DEV.on && DEV.all) || realUnlocked(cat, v);
 const seenNew = new Set(); // unlocked items the player has already looked at in their drop-down
 try { const sn = JSON.parse(localStorage.getItem('burpOperaSeen') || '[]'); if (Array.isArray(sn)) sn.forEach(x => { if (typeof x === 'string' && Object.hasOwn(UNLOCK_AT, x)) seenNew.add(x); }); } catch {}
 if (!isUnlocked('set', curSet)) curSet = 'opera';
@@ -3924,7 +3995,7 @@ function renderWardrobe() {
   grid.className = 'wr-grid' + (round ? '' : ' tiles');
   for (const it of wrList(cat)) {
     const lv = unlockLevel(cat, it.v), off = cat === 'view' && it.v === '3d' && g3failed;
-    const locked = lv > bestLevel || off;
+    const locked = !isUnlocked(cat, it.v) || off;
     const b = document.createElement('button'); b.type = 'button';
     b.className = (round ? 'wr-sw' : 'wr-tile') + (it.sel ? ' sel' : '') + (locked ? ' lock' : '') + (isNew(cat, it.v) ? ' new' : '');
     b.setAttribute('aria-pressed', String(it.sel));
@@ -4002,7 +4073,7 @@ const PICKS = [
   { cat: 'set', ids: ['setPick', 'setPick2'], list: () => Object.keys(SETS).map(k => [SETS[k].label, k]) },
   { cat: 'view', ids: ['viewPick'], list: () => VIEWS },
 ];
-const isNew = (cat, v) => isUnlocked(cat, v) && unlockLevel(cat, v) > 1 && !seenNew.has(cat + ':' + v);
+const isNew = (cat, v) => realUnlocked(cat, v) && unlockLevel(cat, v) > 1 && !seenNew.has(cat + ':' + v);
 function itemName(cat, v) { const p = PICKS.find(q => q.cat === cat), it = p && p.list().find(([, x]) => x === v); return it ? it[0] : v; }
 function nextUnlockText(cat) {
   const next = Object.entries(UNLOCK_AT).filter(([k, lv]) => lv > bestLevel && (!cat || k.startsWith(cat + ':'))).sort((a, b) => a[1] - b[1]);
@@ -4017,7 +4088,7 @@ function refreshPicks() {
       const it = p.list().find(([, v]) => v === o.value); if (!it) continue;
       if (p.cat === 'view' && o.value === '3d' && g3failed) { o.disabled = true; o.textContent = '3D (not available here)'; continue; }
       const lv = unlockLevel(p.cat, o.value);
-      o.disabled = lv > bestLevel;
+      o.disabled = !isUnlocked(p.cat, o.value);
       o.textContent = o.disabled ? it[0] + ' · reach level ' + lv : isNew(p.cat, o.value) ? '★ NEW · ' + it[0] : it[0];
       if (isNew(p.cat, o.value)) fresh = true;
     }
@@ -4032,6 +4103,7 @@ function markSeen(cat) {
 }
 // once a player has opened a glowing drop-down, its NEW stars go away
 function reachLevel(lv) {
+  if (DEV.on) return; // jumping around in dev tools doesn't count as progress
   const before = bestLevel; bestLevel = lv;
   try { localStorage.setItem('burpOperaBestLevel', String(bestLevel)); } catch {}
   const got = Object.entries(UNLOCK_AT).filter(([, l]) => l > before && l <= bestLevel);
@@ -4156,6 +4228,7 @@ const trCount = () => Object.keys(trophies).length;
 function trBadge() { $('trDot').hidden = trCount() <= trSeen; }
 function checkTrophies() {
   if (mode !== 'play' && mode !== 'over') return;
+  if (DEV.on) return;
   let got = 0;
   for (const [id, name, , test] of TROPHIES) {
     if (trophies[id]) continue;
@@ -4173,13 +4246,13 @@ function checkTrophies() {
 }
 let trFilter = 'all', trFresh = new Set();
 function renderTrophies() {
-  const n = trCount();
+  const n = DEV.on && DEV.trAll ? TROPHIES.length : trCount();
   $('trGot').textContent = n; $('trTotal').textContent = TROPHIES.length;
   $('trFill').style.width = (n / TROPHIES.length * 100) + '%';
   for (const b of document.querySelectorAll('.tr-filter')) b.setAttribute('aria-pressed', String(b.dataset.f === trFilter));
   const rows = [];
   for (const [id, name, what, , prog] of TROPHIES) {
-    const won = !!trophies[id];
+    const won = !!trophies[id] || (DEV.on && DEV.trAll);
     if ((trFilter === 'got' && !won) || (trFilter === 'todo' && won)) continue;
     const li = document.createElement('li');
     li.className = 'tr-card' + (won ? ' got' : '') + (trFresh.has(id) ? ' fresh' : '');
@@ -4191,7 +4264,7 @@ function renderTrophies() {
     li.append(svg, nm, ds);
     if (won) {
       const d = document.createElement('span'); d.className = 'tr-date';
-      d.textContent = '★ ' + new Date(trophies[id]).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      d.textContent = !trophies[id] ? '★ Preview' : '★ ' + new Date(trophies[id]).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
       li.append(d);
       if (trFresh.has(id)) { const t = document.createElement('span'); t.className = 'tr-new'; t.textContent = 'NEW'; li.append(t); }
     } else if (prog) {
@@ -4218,6 +4291,86 @@ $('trOpen1').onclick = openTrophies; $('trOpen2').onclick = openTrophies; $('trC
 $('trPop').addEventListener('pointerdown', e => { if (e.target.id === 'trPop') closeTrophies(); });
 for (const b of document.querySelectorAll('.tr-filter')) b.onclick = () => { trFilter = b.dataset.f; renderTrophies(); };
 trBadge();
+
+// ---------- dev tools panel ----------
+function saveDev() { try { localStorage.setItem('burpOperaDev', JSON.stringify(DEV)); } catch {} }
+let devPaused = false;
+function showDevBtn() { $('devBtn').hidden = !DEV.on; }
+function openDev() {
+  if (!DEV.on) { DEV.on = true; saveDev(); showDevBtn(); refreshPicks(); }
+  if (mode === 'play' && !paused) { paused = true; devPaused = true; humStop(); S.holding = false; }
+  for (const b of document.querySelectorAll('.dev-tog')) b.setAttribute('aria-pressed', String(!!DEV[b.dataset.k]));
+  $('devLevel').max = String(MODES[modeKey].levels);
+  $('devResetYes').hidden = true; $('devPop').hidden = false; $('devClose').focus({ preventScroll: true });
+}
+function closeDev() {
+  $('devPop').hidden = true;
+  if (devPaused && mode === 'play') paused = false;
+  devPaused = false; setButtons();
+}
+// run something inside a game, starting one first when needed
+function inGame(fn) {
+  $('devPop').hidden = true; devPaused = false;
+  for (const id of ['trPop', 'lbPop', 'frogPop', 'paused']) $(id).hidden = true;
+  if (mode !== 'play') start(); else { if (inMenu) closeMenu(); paused = false; }
+  setButtons(); setTimeout(() => { if (mode === 'play') fn(); }, 120);
+}
+function devLevel(n, boss) {
+  inGame(() => {
+    n = Math.max(1, Math.min(MAX_LEVEL, Math.floor(Number(n)) || 1));
+    S.ghosts = []; S.boss = null; S.secret = false;
+    if (n > 1) { S.level = n - 1; nextLevel('Dev jump'); }
+    if (boss) { S.levelT = 0.01; startBoss(); }
+  });
+}
+// a gentle way to fix choices that are no longer allowed once "unlock everything" is switched off
+function relock() {
+  if (!isUnlocked('frog', frogCol)) { frogCol = FROG_COLORS[0][1]; for (const id of ['frogPick', 'popFrog']) $(id).value = frogCol; try { localStorage.setItem('burpOperaFrog', frogCol); } catch {} }
+  if (!isUnlocked('hat', hatCol)) { hatCol = HAT_COLORS[0][1]; for (const id of ['hatPick', 'popHat']) $(id).value = hatCol; try { localStorage.setItem('burpOperaHat', hatCol); } catch {} }
+  setSet(curSet); setView(view8 ? '8bit' : view3d ? '3d' : '2d');
+}
+for (const b of document.querySelectorAll('.dev-tog')) b.onclick = () => {
+  const k = b.dataset.k; DEV[k] = !DEV[k]; saveDev(); b.setAttribute('aria-pressed', String(DEV[k]));
+  if (k === 'all') { if (!DEV.all) relock(); refreshPicks(); }
+  if (k === 'god' && mode === 'play') S.lives = DEV.god ? Infinity : M.lives;
+  blip(DEV[k] ? 880 : 440, 0.1, 'triangle', 0.1, 1.4);
+};
+$('devGoLevel').onclick = () => devLevel($('devLevel').value, false);
+$('devBoss').onclick = () => { if (mode === 'play' && !S.boss) inGame(() => { S.levelT = 0.01; startBoss(); }); else devLevel($('devLevel').value, true); };
+$('devFinal').onclick = () => devLevel(MODES[modeKey].levels, true);
+$('devPows').replaceChildren(...POW_KEYS.map(k => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'chip-btn'; b.textContent = POWERS[k].name.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+  b.style.borderColor = POWERS[k].c;
+  b.onclick = () => inGame(() => { S.pows[k] = POWERS[k].dur * M.powDur; if (k === 'triple') S.pows.double = 0; S.frogGlow = 1; S.glowC = POWERS[k].c; say(frogX() + 80, groundY() - 160, POWERS[k].name + '!', POWERS[k].c, 24); });
+  return b;
+}));
+$('devChaos').replaceChildren(...CHAOS.map(ev => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'chip-btn'; b.textContent = ev.name.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+  b.onclick = () => inGame(() => { S.boss = null; S.chaos = { ...ev, left: ev.dur || 8 }; S.chaosCount = (S.chaosCount || 0) + 1; S.flash = 1; swoop('chaos'); blip(200, 0.6, 'square', 0.12, 4); });
+  return b;
+}));
+$('devTeach').onclick = () => inGame(() => { S.teach = 5; });
+$('devCan').onclick = () => inGame(() => { canTaught = false; spawnItem(); });
+$('devRed').onclick = () => { if (S.level < 6 || mode !== 'play') devLevel(Math.min(6, MODES[modeKey].levels), false); else closeDev(); };
+$('devToast').onclick = () => inGame(() => { S.toasts.push({ text: '🥇 TROPHY: ' + TROPHIES[Math.floor(Math.random() * TROPHIES.length)][1].toUpperCase() + ' (TEST)', left: 3.6 }); [784, 988, 1175, 1568].forEach((f, i) => setTimeout(() => blip(f, 0.18, 'triangle', 0.12, 1.2), i * 90)); });
+$('devOver').onclick = () => inGame(() => gameOver(false));
+$('devWin').onclick = () => inGame(() => { S.level = MAX_LEVEL; gameOver(true); });
+$('devTrophies').onclick = () => { closeDev(); openTrophies(); };
+$('devBoards').onclick = () => { closeDev(); $('lbOpen1').click(); };
+$('devLock').onclick = () => { closeDev(); $('lockPop').hidden = false; $('lockCancel').focus({ preventScroll: true }); };
+$('devReset').onclick = () => { $('devResetYes').hidden = false; $('devResetYes').focus({ preventScroll: true }); };
+$('devResetYes').onclick = () => {
+  try { for (const k of Object.keys(localStorage)) if (k.startsWith('burpOpera') && k !== 'burpOperaDev') localStorage.removeItem(k); } catch {}
+  window.location.reload();
+};
+$('devOff').onclick = () => { DEV.on = false; DEV.all = false; DEV.god = false; DEV.trAll = false; saveDev(); relock(); refreshPicks(); showDevBtn(); closeDev(); if (mode === 'play' && S && !Number.isFinite(S.lives) && Number.isFinite(M.lives)) S.lives = M.lives; };
+$('devClose').onclick = closeDev;
+$('devBtn').onclick = openDev;
+$('devPop').addEventListener('pointerdown', e => { if (e.target.id === 'devPop') closeDev(); });
+// five quick taps on the title opens the dev tools
+{ let taps = 0, last = 0; $('title').querySelector('h1').addEventListener('click', () => { const t = performance.now(); taps = t - last < 700 ? taps + 1 : 1; last = t; if (taps >= 5) { taps = 0; openDev(); } }); }
+showDevBtn();
+if (window.location.hash === '#dev') { saveDev(); refreshPicks(); }
 
 // ---------- world leaderboards, shared through the artifact's database ----------
 // daily boards per skill level change over at 1:00 AM Eastern; each finished day's best move onto the all-time boards
@@ -4269,6 +4422,7 @@ async function rolloverBoards() {
   } catch { lbDb = null; }
 })();
 async function offerHighScore(m, score, level) {
+  if (DEV.on) { $('lbNote').textContent = 'Dev tools are on, so this score was not posted.'; return; }
   if (!LB_MODES.includes(m) || !(score > 0)) return;
   if (!lbDb) { $('lbNote').textContent = 'World leaderboards are available when the game is opened in Claude.'; return; }
   if (lbCanWrite === false) { $('lbNote').textContent = 'Your score can be seen but not posted from this account.'; return; }
