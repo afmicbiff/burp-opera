@@ -421,7 +421,7 @@ let view8 = false; // 8-bit view (set from saved choice further down)
 {
   const fontD = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'font');
   if (fontD && fontD.set) Object.defineProperty(mainCtx, 'font', { get() { return fontD.get.call(this); }, set(v) {
-    if (view8) { const m = /(\d+(?:\.\d+)?)px/.exec(v); if (m) v = Math.max(8, Math.round(parseFloat(m[1]) * 0.62)) + 'px "Press Start 2P", monospace'; }
+    if (view8) { const m = /(\d+(?:\.\d+)?)px/.exec(v); if (m) { const f = parseFloat(m[1]); v = (f <= 12 ? 8 : Math.ceil(f * 0.62 / 8) * 8) + 'px "Press Start 2P", monospace'; } }
     fontD.set.call(this, v);
   } });
 }
@@ -1957,7 +1957,16 @@ function drawHazard(z) {
 }
 
 const burpOffsets = () => has('triple') ? [0, -48, 48] : has('double') ? [-28, 28] : [0];
-function txt(s, x, y) { ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(26,11,46,.85)'; ctx.strokeText(s, x, y); ctx.fillText(s, x, y); }
+function txt(s, x, y) {
+  if (view8 && ctx === mainCtx) {
+    x = Math.round(x); y = Math.round(y);
+    const u = Math.max(1, Math.round((parseFloat(ctx.font) || 8) / 8)), fill = ctx.fillStyle;
+    ctx.fillStyle = '#000000';
+    for (const [dx, dy] of [[-u, 0], [u, 0], [0, -u], [0, u], [u, u]]) ctx.fillText(s, x + dx, y + dy);
+    ctx.fillStyle = fill; ctx.fillText(s, x, y); return;
+  }
+  ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(26,11,46,.85)'; ctx.strokeText(s, x, y); ctx.fillText(s, x, y);
+}
 const halo = document.createElement('canvas'); halo.width = halo.height = 128;
 { const hx = halo.getContext('2d'), g = hx.createRadialGradient(64, 64, 8, 64, 64, 64); g.addColorStop(0, 'rgba(26,11,46,.5)'); g.addColorStop(1, 'rgba(26,11,46,0)'); hx.fillStyle = g; hx.fillRect(0, 0, 128, 128); }
 
@@ -3039,6 +3048,7 @@ function drawPreview(cvs = pvCv, backdrop = true) {
   const dp = Math.min(window.devicePixelRatio || 1, 2), w = cvs.clientWidth, h = cvs.clientHeight;
   if (!w || !h) return;
   if (cvs.width !== Math.round(w * dp) || cvs.height !== Math.round(h * dp)) { cvs.width = Math.round(w * dp); cvs.height = Math.round(h * dp); }
+  if (view8) { drawPreview8(cvs, w, h, dp, backdrop); return; }
   const main = ctx; ctx = cvs.getContext('2d');
   try {
   ctx.setTransform(dp, 0, 0, dp, 0, 0);
@@ -3051,6 +3061,35 @@ function drawPreview(cvs = pvCv, backdrop = true) {
   const s = Math.min(w, h) / 175;
   ctx.save(); ctx.scale(s, s); drawFrog({ x: w / 2 / s - 8, gy: h * 0.9 / s, p: (Math.sin(clock * 2.2) + 1) * 0.22 }); ctx.restore();
   } finally { ctx = main; }
+}
+
+const pv8 = {};
+function drawPreview8(cvs, w, h, dp, backdrop) {
+  // draw small, snap to the palette with an outline, then blow up with hard pixel edges
+  const u = Math.max(3, Math.round(Math.min(w, h) / 40)), lw = Math.ceil(w / u), lh = Math.ceil(h / u);
+  const key = backdrop ? 'pop' : 'title';
+  let b = pv8[key];
+  if (!b) { const c = document.createElement('canvas'); b = pv8[key] = { c, x: pixContext(c) }; }
+  if (b.c.width !== lw || b.c.height !== lh) { b.c.width = lw; b.c.height = lh; }
+  const main = ctx, keepPix = pixSize; ctx = b.x; pixSize = u * 0.6; // outlines sized for this little canvas
+  try {
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.clearRect(0, 0, lw, lh);
+    ctx.setTransform(1 / u, 0, 0, 1 / u, 0, 0);
+    const s = Math.min(w, h) / 175;
+    ctx.save(); ctx.scale(s, s); drawFrog({ x: w / 2 / s - 8, gy: h * 0.9 / s, p: Math.round((Math.sin(clock * 2.2) + 1) * 2) * 0.11 }); ctx.restore();
+  } finally { ctx = main; pixSize = keepPix; }
+  palettize(b.x, lw, lh, false);
+  const c2 = cvs.getContext('2d');
+  c2.setTransform(1, 0, 0, 1, 0, 0); c2.clearRect(0, 0, cvs.width, cvs.height);
+  const px = u * dp, gy = Math.round(h * 0.9 / u) * px;
+  if (backdrop) {
+    c2.fillStyle = '#1d2b53'; c2.fillRect(0, 0, cvs.width, cvs.height);
+    c2.fillStyle = '#111d35'; for (let y = 0; y < cvs.height; y += px * 2) c2.fillRect(0, y, cvs.width, px); // backdrop stripes
+  }
+  // a blocky shadow under the frog
+  c2.fillStyle = backdrop ? '#000000' : 'rgba(0,0,0,.35)';
+  const sw = Math.round(w * 0.6 / u) * px; c2.fillRect(Math.round((cvs.width - sw) / 2 / px) * px, gy - px, sw, px * 2);
+  c2.imageSmoothingEnabled = false; c2.drawImage(b.c, 0, 0, lw * px, lh * px); c2.imageSmoothingEnabled = true;
 }
 
 function drawGhost(g) {
@@ -3792,6 +3831,7 @@ const PAL8 = ['#000000', '#1d2b53', '#7e2553', '#008751', '#ab5236', '#5f574f', 
 const LUT8 = new Uint8Array(32768).fill(255);
 // two tiny canvases: the backdrop, and the sprites (characters, burps, confetti) that get a black outline
 let pixCv = null, pixCtx = null, sprCv = null, sprCtx = null, pixSize = 4;
+const pixShake = { n: 0, x: 0, y: 0 };
 function pixContext(c) {
   const x = c.getContext('2d', { willReadFrequently: true });
   // soft glows turn into muddy blobs in a 32-color palette, so 8-bit has none
@@ -3800,6 +3840,16 @@ function pixContext(c) {
   // thin lines would vanish at low resolution, so every stroke is at least one big pixel wide
   const lw = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'lineWidth');
   if (lw && lw.set) Object.defineProperty(x, 'lineWidth', { get() { return lw.get.call(this); }, set(v) { lw.set.call(this, Math.max(v, pixSize * 0.9)); } });
+  // sprites land on whole big pixels, so their edges don't wobble as they move
+  const tr = CanvasRenderingContext2D.prototype.translate;
+  x.translate = function (a, b) {
+    tr.call(this, a, b);
+    const m = this.getTransform();
+    if (Math.abs(m.b) < 1e-9 && Math.abs(m.c) < 1e-9) { const e = Math.round(m.e), f = Math.round(m.f); if (e !== m.e || f !== m.f) { m.e = e; m.f = f; this.setTransform(m); } }
+  };
+  // fades move in four clear steps, like old consoles, instead of shimmering between palette colors
+  const ga = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'globalAlpha');
+  if (ga && ga.set) Object.defineProperty(x, 'globalAlpha', { get() { return ga.get.call(this); }, set(v) { ga.set.call(this, v >= 0.9 ? 1 : Math.round(v * 4) / 4); } });
   return x;
 }
 function initPix() {
@@ -3822,31 +3872,38 @@ function nearest8(r, g, b) {
   return PAL8[k];
 }
 // sprites: hard-edged pixels in palette colors, plus a one-pixel black outline so they pop off any backdrop
-function sprites8() {
-  const w = sprCv.width, h = sprCv.height, img = sprCtx.getImageData(0, 0, w, h), d = img.data, solid = new Uint8Array(w * h);
+function sprites8() { palettize(sprCtx, sprCv.width, sprCv.height, true); }
+function palettize(c2, w, h, scanlines) {
+  const img = c2.getImageData(0, 0, w, h), d = img.data, solid = new Uint8Array(w * h);
   for (let q = 0, i = 0; q < w * h; q++, i += 4) {
     if (d[i + 3] < 110) { d[i + 3] = 0; continue; }
     const a = d[i + 3] / 255, c = nearest8(Math.min(255, d[i] / a), Math.min(255, d[i + 1] / a), Math.min(255, d[i + 2] / a));
-    d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255; solid[q] = 1;
+    const sc = scanlines && (q / w | 0) % 2 ? 0.94 : 1;
+    d[i] = c[0] * sc; d[i + 1] = c[1] * sc; d[i + 2] = c[2] * sc; d[i + 3] = 255; solid[q] = 1;
   }
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const q = y * w + x;
     if (solid[q]) continue;
     if ((x > 0 && solid[q - 1]) || (x < w - 1 && solid[q + 1]) || (y > 0 && solid[q - w]) || (y < h - 1 && solid[q + w])) { const i = q * 4; d[i] = 0; d[i + 1] = 0; d[i + 2] = 0; d[i + 3] = 255; }
   }
-  sprCtx.putImageData(img, 0, 0);
+  c2.putImageData(img, 0, 0);
 }
+// 4x4 ordered dither: gradients become tidy checker patterns instead of random blotches
+const BAYER4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v / 16 - 0.47) * 12);
 function quantize8() {
-  sprites8();
-  pixCtx.setTransform(1, 0, 0, 1, 0, 0); pixCtx.globalAlpha = 1; pixCtx.drawImage(sprCv, 0, 0);
+  // the backdrop first (dithered), then the sprites (flat colors with an outline) on top
   const w = pixCv.width, h = pixCv.height, img = pixCtx.getImageData(0, 0, w, h), d = img.data;
   for (let y = 0, i = 0; y < h; y++) {
-    const scan = y % 2 ? 0.94 : 1; // faint scanlines
+    const scan = y % 2 ? 0.94 : 1, row = (y & 3) * 4; // faint scanlines
     for (let x = 0; x < w; x++, i += 4) {
-      const c = nearest8(d[i], d[i + 1], d[i + 2]); d[i] = c[0] * scan; d[i + 1] = c[1] * scan; d[i + 2] = c[2] * scan; d[i + 3] = 255;
+      const t = BAYER4[row + (x & 3)];
+      const c = nearest8(Math.max(0, Math.min(255, d[i] + t)), Math.max(0, Math.min(255, d[i + 1] + t)), Math.max(0, Math.min(255, d[i + 2] + t)));
+      d[i] = c[0] * scan; d[i + 1] = c[1] * scan; d[i + 2] = c[2] * scan; d[i + 3] = 255;
     }
   }
   pixCtx.putImageData(img, 0, 0);
+  sprites8();
+  pixCtx.setTransform(1, 0, 0, 1, 0, 0); pixCtx.globalAlpha = 1; pixCtx.drawImage(sprCv, 0, 0);
 }
 
 let frameErrors = 0;
@@ -3875,7 +3932,11 @@ function render() {
   const pix = view8 && initPix();
   if (pix) { ctx = pixCtx; ctx.setTransform(1 / pixSize, 0, 0, 1 / pixSize, 0, 0); ctx.globalAlpha = 1; }
   else ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const sx = reduce ? 0 : (Math.random() - .5) * S.shake * M.shake, sy = reduce ? 0 : (Math.random() - .5) * S.shake * M.shake;
+  let sx = reduce ? 0 : (Math.random() - .5) * S.shake * M.shake, sy = reduce ? 0 : (Math.random() - .5) * S.shake * M.shake;
+  if (pix) {
+    if ((pixShake.n = (pixShake.n + 1) % 2) === 0 || S.shake < 0.5) { pixShake.x = Math.round(sx * 0.6 / pixSize) * pixSize; pixShake.y = Math.round(sy * 0.6 / pixSize) * pixSize; }
+    sx = pixShake.x; sy = pixShake.y;
+  }
   ctx.translate(sx, sy);
   const flip = chaosOn('flip');
   if (flip) { ctx.translate(0, H); ctx.scale(1, -1); }
@@ -4092,7 +4153,7 @@ function refreshPicks() {
       if (p.cat === 'view' && o.value === '3d' && g3failed) { o.disabled = true; o.textContent = '3D (not available here)'; continue; }
       const lv = unlockLevel(p.cat, o.value);
       o.disabled = !isUnlocked(p.cat, o.value);
-      o.textContent = o.disabled ? it[0] + (p.cat === 'view' ? ' 🔒 Lv ' : ' · reach level ') + lv : isNew(p.cat, o.value) ? '★ NEW · ' + it[0] : it[0];
+      o.textContent = o.disabled ? it[0] + (p.cat === 'view' ? ' 🔒 Lv ' : ' · reach level ') + lv : isNew(p.cat, o.value) ? (p.cat === 'view' ? it[0] + ' ★' : '★ NEW · ' + it[0]) : it[0];
       if (isNew(p.cat, o.value)) fresh = true;
     }
     for (const id of p.ids) $(id).classList.toggle('has-new', fresh);
