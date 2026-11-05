@@ -124,6 +124,39 @@ button.go.play-btn { width: min(360px, 86vw); font-size: clamp(1.5rem, 6.5vw, 2r
 .chip-pick:focus-within, .chip-pick:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
 .dot { position: absolute; top: -5px; right: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 3px var(--plum), 0 0 14px var(--cyan); }
 @media (prefers-reduced-motion: no-preference) { .dot { animation: dotpulse 1.1s ease-in-out infinite; } @keyframes dotpulse { 50% { transform: scale(1.3); } } }
+.corner-btns { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); z-index: 2; display: flex; gap: 8px; flex-wrap: wrap; max-width: calc(100% - 140px); }
+.tr-btn { position: relative; }
+.over-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.tr-line:empty { display: none; }
+.tr-line { color: #ffd21f; }
+#trPop { z-index: 6; }
+.tr-pop { max-width: 760px; gap: 10px; }
+.tr-count { font-family: var(--display); color: #ffd21f; font-size: 1.6rem; margin: 0; font-variant-numeric: tabular-nums; }
+.tr-count b { font-weight: 400; color: var(--ink); }
+.tr-bar { width: min(320px, 80%); height: 10px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; }
+.tr-bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #b8860b, #ffd21f, #fff3b0); }
+.tr-tabs { display: flex; gap: 6px; }
+.tr-filter[aria-pressed="true"] { background: #ffd21f; color: var(--plum); border-color: #ffd21f; }
+.tr-grid { list-style: none; margin: 0; padding: 4px; width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(130px, 40%), 1fr)); gap: 8px; max-height: min(58vh, 620px); overflow-y: auto; box-sizing: border-box; }
+.tr-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 8px 10px; border-radius: 14px; background: rgba(59,15,79,.6); border: 2px solid rgba(255,255,255,.1); text-align: center; min-width: 0; }
+.tr-card svg { width: 54px; height: 54px; }
+.tr-card.got { border-color: #ffd21f; background: radial-gradient(ellipse at 50% 20%, rgba(255,210,31,.28), rgba(59,15,79,.7) 70%); }
+.tr-card.got svg { filter: drop-shadow(0 0 10px rgba(255,210,31,.75)); }
+.tr-card:not(.got) svg { filter: grayscale(1) brightness(.45); opacity: .7; }
+.tr-card.fresh { box-shadow: 0 0 0 3px var(--cyan), 0 0 18px var(--cyan); }
+.tr-name { font-family: var(--display); font-size: .82rem; color: var(--ink); line-height: 1.15; }
+.tr-card.got .tr-name { color: #ffd21f; }
+.tr-desc { font-family: var(--mono); font-size: .72rem; color: var(--dim); line-height: 1.3; }
+.tr-prog { width: 80%; height: 6px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 2px; }
+.tr-prog i { display: block; height: 100%; background: var(--cyan); }
+.tr-num { font-family: var(--mono); font-size: .66rem; color: var(--cyan); font-variant-numeric: tabular-nums; }
+.tr-date { font-family: var(--mono); font-size: .66rem; color: #ffd21f; }
+.tr-new { position: absolute; top: 6px; right: 6px; font-family: var(--display); font-size: .6rem; background: var(--cyan); color: var(--plum); border-radius: 99px; padding: 2px 6px; }
+body.pixel .tr-card, body.pixel .tr-bar, body.pixel .tr-prog { border-radius: 0; }
+body.pixel .tr-name { font-size: .55rem; line-height: 1.6; }
+body.pixel .tr-desc, body.pixel .tr-date, body.pixel .tr-num { font-size: .45rem; line-height: 1.7; }
+body.pixel .tr-card svg { width: 40px; height: 40px; }
+body.pixel .tr-count { font-size: 1rem; }
 .corner-btn { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); z-index: 2; }
 /* wardrobe */
 .wardrobe { gap: 12px; max-width: 460px; }
@@ -176,7 +209,10 @@ button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
   </div>
 
   <div class="overlay" id="title">
-    <button class="chip-btn lb-btn corner-btn" id="lbOpen1" type="button" aria-label="World leaderboards">🏆 Top 10</button>
+    <div class="corner-btns">
+      <button class="chip-btn lb-btn" id="lbOpen1" type="button" aria-label="World leaderboards">🏆 Top 10</button>
+      <button class="chip-btn tr-btn" id="trOpen1" type="button" aria-label="Trophy room">🥇 Trophies<i class="dot" id="trDot" hidden></i></button>
+    </div>
     <p class="tag">Tonight only · a frog in a top hat</p>
     <h1>Burp<br>Opera</h1>
     <canvas id="titleFrog" class="title-frog" aria-hidden="true"></canvas>
@@ -205,7 +241,11 @@ button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
     <p class="small" id="stats"></p>
     <p class="small unlock-hint" id="unlocksLine"></p>
     <p class="small lb-note" id="lbNote"></p>
-    <button class="chip-btn lb-btn" id="lbOpen2" type="button">World leaderboards</button>
+    <p class="small tr-line" id="trLine"></p>
+    <div class="over-btns">
+      <button class="chip-btn lb-btn" id="lbOpen2" type="button">World leaderboards</button>
+      <button class="chip-btn tr-btn" id="trOpen2" type="button">🥇 Trophies</button>
+    </div>
     <div class="picks">
       <label class="pick" for="setPick2">Next cast <select id="setPick2"></select></label>
       <label class="pick" for="modePick2">Skill level <select id="modePick2"></select></label>
@@ -266,6 +306,34 @@ button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
       <p class="small" id="lbStatus"></p>
       <p class="small">Today's boards change over at 1:00 AM Eastern. Each day's best scores then move to the all-time boards.</p>
       <button class="go alt" id="lbClose" type="button">Close</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="trPop" hidden role="dialog" aria-modal="true" aria-labelledby="trTitle">
+    <div class="pop tr-pop">
+      <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+          <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".45" stop-color="#ffd21f"/><stop offset="1" stop-color="#b8860b"/></linearGradient>
+          <linearGradient id="goldDark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a400"/><stop offset="1" stop-color="#8a6200"/></linearGradient>
+        </defs>
+        <symbol id="trophy" viewBox="0 0 64 64">
+          <path d="M18 8h28v14c0 9-6 16-14 16S18 31 18 22z" fill="url(#gold)" stroke="#7a5600" stroke-width="2"/>
+          <path d="M18 12H9c0 10 5 15 11 16M46 12h9c0 10-5 15-11 16" fill="none" stroke="url(#goldDark)" stroke-width="4" stroke-linecap="round"/>
+          <rect x="28" y="37" width="8" height="9" fill="url(#goldDark)"/>
+          <path d="M20 46h24l3 10H17z" fill="url(#gold)" stroke="#7a5600" stroke-width="2"/>
+          <path d="M24 12c0 8 2 14 6 18" fill="none" stroke="#fffbe0" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+        </symbol>
+      </svg>
+      <p class="tag" id="trTitle">Trophy room</p>
+      <p class="tr-count"><b id="trGot">0</b> / <span id="trTotal">50</span></p>
+      <div class="tr-bar" aria-hidden="true"><i id="trFill"></i></div>
+      <div class="tr-tabs" role="group" aria-label="Show">
+        <button class="chip-btn tr-filter" type="button" data-f="all" aria-pressed="true">All</button>
+        <button class="chip-btn tr-filter" type="button" data-f="got" aria-pressed="false">Won</button>
+        <button class="chip-btn tr-filter" type="button" data-f="todo" aria-pressed="false">To win</button>
+      </div>
+      <ul class="tr-grid" id="trGrid"></ul>
+      <button class="go alt" id="trClose" type="button">Close</button>
     </div>
   </div>
 
@@ -472,6 +540,7 @@ addEventListener('keydown', e => {
   if (!$('iniPop').hidden) { if (e.code === 'Escape') $('iniSkip').click(); if (e.code === 'Enter') $('iniSave').click(); return; }
   if (!$('lbPop').hidden) { if (e.code === 'Escape') $('lbClose').click(); return; }
   if (!$('lockPop').hidden) { if (e.code === 'Escape') $('lockCancel').click(); return; }
+  if (!$('trPop').hidden) { if (e.code === 'Escape') closeTrophies(); return; }
   if (!$('frogPop').hidden) { if (e.code === 'Escape') closeLook(); return; }
   if ((e.code === 'KeyP' || e.code === 'Escape') && mode === 'play' && !inMenu) { e.preventDefault(); pauseGame(!paused); return; }
   if (e.code === 'Space') {
@@ -525,6 +594,9 @@ function start() {
   if (M.daily) S.banner.top = "Today's challenge · " + new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   countCastPlay(); paused = false; inMenu = false;
   S.teach = taught ? 0 : 5;
+  S.view = view8 ? '8bit' : view3d ? '3d' : '2d'; S.won = false;
+  ST.games++; if (!ST.modes.includes(modeKey)) ST.modes.push(modeKey); saveStats();
+  checkTrophies();
   $('title').hidden = true; $('over').hidden = true; $('paused').hidden = true; $('resumeTitle').hidden = true; $('title').classList.remove('resuming');
   setButtons(); swoop('intro');
   blip(300, 0.15, 'square', 0.1, 2); setTimeout(() => blip(600, 0.2, 'square', 0.1, 1.5), 120);
@@ -546,6 +618,8 @@ function favoriteCast() { const o = castPlays(); let bestK = curSet; for (const 
 function gameOver(won) {
   if (mode !== 'play') return;
   mode = 'over'; humStop(); S.holding = false; paused = false; inMenu = false; setButtons(); swoop('over');
+  S.won = !!won; checkTrophies(); saveStats();
+  $('trLine').textContent = S.newTrophies && S.newTrophies.length ? '🥇 New trophies: ' + S.newTrophies.join(', ') : '';
   best = loadBest(modeKey);
   if (S.score > best) { best = S.score; try { localStorage.setItem('burpOperaBest_' + modeKey, best); } catch {} }
   const ranks = [[1,'Tadpole Tenor'],[5,'Swamp Soprano'],[15,'Baritone of Belches'],[30,'Maestro of Methane'],[60,'Phantom of the Burpera'],[90,'Diva of the Deep Croak']];
@@ -1682,6 +1756,7 @@ function collect(it, w) {
   const P = POWERS[it.kind], y = pitchY(it.p);
   it.got = true; w.hit++; w.grp.hit++;
   S.pows[it.kind] = P.dur * M.powDur;
+  ST.pows++; if (!ST.powKinds.includes(it.kind)) ST.powKinds.push(it.kind);
   if (it.kind === 'triple') S.pows.double = 0;
   if (it.kind === 'double' && has('triple')) S.pows.triple = Math.max(S.pows.triple, P.dur);
   S.freeze = Math.max(S.freeze, 0.06); S.shake = Math.max(S.shake, 8); S.frogGlow = 1; S.glowC = P.c;
@@ -1782,7 +1857,7 @@ function hazardHit(z) {
     S.score = Math.max(0, S.score - 1000);
     say(z.x, y - 40, '-1,000', '#ff2a3a', 32); say(z.x, y - 76, 'MY POINTS!', C.ink, 16);
   } else if (has('shield')) {
-    S.pows.shield = 0; say(z.x, y - 40, 'SHIELD SAVED YOU!', '#6fdc5a', 22);
+    S.pows.shield = 0; S.shieldSaved = true; say(z.x, y - 40, 'SHIELD SAVED YOU!', '#6fdc5a', 22);
   } else if (!Number.isFinite(S.lives)) {
     S.score = Math.max(0, S.score - 500); say(z.x, y - 40, '-500', '#ff2a3a', 32);
   } else {
@@ -1892,6 +1967,7 @@ function update(dt) {
   if (S.freeze > 0) { S.freeze -= dt; return; }
   if (S.slowmo > 0) { S.slowmo -= dt; dt *= 0.35; }
   if (S.intro) { S.intro.left -= dt; if (S.intro.left <= 0) S.intro = null; }
+  S.trT = (S.trT || 0) - dt; if (S.trT <= 0) { S.trT = 0.5; checkTrophies(); }
   if (S.teach > 0) { S.teach -= dt; if (S.teach <= 0) { S.teach = 0; taught = true; try { localStorage.setItem('burpOperaTaught', '1'); } catch {} } }
   if (S.fever > 0) S.fever -= dt;
   const slow = (chaosOn('slow') ? 0.5 : 1) * (has('slow') ? 0.45 : 1) * (chaosOn('speed') ? 2 : 1);
@@ -1904,7 +1980,7 @@ function update(dt) {
     if (M.fuse === Infinity) S.pitch = Math.min(S.pitch, 1); // Little Burper and friends can never overinflate
     humSet(Math.min(1, S.pitch));
     if (S.pitch > M.fuse) {
-      S.holding = false; humStop(); S.dizzy = 0.8; S.combo = 0; S.shake = 14;
+      S.holding = false; humStop(); S.dizzy = 0.8; S.combo = 0; S.shake = 14; S.gas = true;
       say(frogX() + 40, pitchY(1) + 30, 'TOO MUCH GAS', C.tang, 26);
       burst(frogX(), groundY() - 60, 30, [C.frog, C.tang, C.ink]);
       blip(120, 0.4, 'sawtooth', 0.2, 0.4);
@@ -1919,6 +1995,7 @@ function update(dt) {
     if (ev && !chaosOn(ev.id)) {
       const e = { ...ev, left: ev.dur || 8 };
       if (!S.chaos) S.chaos = e; else S.chaos2 = e;
+      S.chaosCount = (S.chaosCount || 0) + 1;
       S.flash = 1; swoop('chaos'); blip(200, 0.6, 'square', 0.12, 4);
       if (M.stack) S.nextChaos = S.t + 3; // Crazy Expert can stack a second event on top
     }
@@ -1978,7 +2055,7 @@ function update(dt) {
       if (has('shield')) {
         S.flawless = false;
         const gy = pitchY(g.p), k = skin(g.type);
-        S.pows.shield = 0; S.shake = 12; S.freeze = 0.06;
+        S.pows.shield = 0; S.shieldSaved = true; S.shake = 12; S.freeze = 0.06;
         burst(g.x, gy, 30, [k.c, '#ffffff', '#6fdc5a']);
         ring(frogX(), groundY() - 52, '#6fdc5a', { r: 70, vr: 500, life: 0.5, w: 10 });
         say(frogX() + 70, gy, 'BLOCKED!', '#6fdc5a', 26);
@@ -2037,8 +2114,9 @@ function update(dt) {
         }
         if (d.hp > 1 && dmg > 1 && k.hurt) k.hurt(g, gy);
         g.dead = true; w.hit++; w.grp.hit++; S.combo++; S.hits++; S.maxCombo = Math.max(S.maxCombo, S.combo);
+        ST.pops++; w.grp.kills = (w.grp.kills || 0) + 1; S.bestMulti = Math.max(S.bestMulti || 0, w.grp.kills);
         if (M.hype && S.combo % 10 === 0) { say(W / 2, H * 0.3, '×' + S.combo + ' HYPE!', C.pink, 34); blip(880, 0.2, 'square', 0.12, 1.5); }
-        if (M.hype && S.combo === 20) { S.fever = 8; S.flash = 1; say(W / 2, H * 0.38, 'FEVER MODE! ×2 POINTS', C.tang, 30); }
+        if (M.hype && S.combo === 20) { S.feverHit = true; S.fever = 8; S.flash = 1; say(W / 2, H * 0.38, 'FEVER MODE! ×2 POINTS', C.tang, 30); }
         const mult = 1 + Math.floor(S.combo / 5);
         const accuracy = 1 - Math.min(1, Math.abs(gy - w.y) / (g.r + tol));
         const pts = scoreGain((100 + accuracy * 100) * mult * d.pts * (w.hit > 1 ? w.hit : 1));
@@ -2061,7 +2139,7 @@ function update(dt) {
       w.counted = true;
       if (w.main && w.grp.hit > 0) S.landed++;
       if (w.main && w.grp.hit === 0) {
-        S.combo = 0;
+        S.combo = 0; if (!w.grp.red) S.misses = (S.misses || 0) + 1;
         // a burp that hit nothing at all costs points (red circles already have their own penalty)
         if (!w.grp.red && mode === 'play' && M.miss > 0) {
           S.score = Math.max(0, S.score - M.miss);
@@ -2194,7 +2272,7 @@ function bossHit(w, dmg = 1) {
 
 function bossDefeated() {
   const b = S.boss, bonus = scoreGain(1000 * S.level * (S.secret ? 3 : 1)), by = pitchY(b.p);
-  S.bossesBeaten++; if (S.secret) S.secretBeaten = true;
+  S.bossesBeaten++; ST.bosses++; if (S.secret) S.secretBeaten = true;
   S.score += bonus; S.boss = null; S.ghosts = [];
   ring(b.x, by, b.c, { r: 30, vr: 1400, life: 0.9, w: 18 });
   ring(b.x, by, '#ffffff', { r: b.r, vr: 900, life: 0.25, fill: true });
@@ -4004,6 +4082,143 @@ refreshPicks();
     setView(vp.value); markSeen('view'); blip(660, 0.1, 'triangle', 0.1, 1.5);
   };
 }
+// ---------- trophies: fifty gold trophies, earned once and kept on this device ----------
+const ST = { pops: 0, bosses: 0, pows: 0, games: 0, powKinds: [], modes: [] };
+try {
+  const o = JSON.parse(localStorage.getItem('burpOperaStats') || '{}');
+  for (const k of ['pops', 'bosses', 'pows', 'games']) { const n = Math.floor(Number(o && o[k])); if (Number.isFinite(n) && n > 0) ST[k] = Math.min(n, 1e9); }
+  if (o && Array.isArray(o.powKinds)) ST.powKinds = o.powKinds.filter(k => Object.hasOwn(POWERS, k));
+  if (o && Array.isArray(o.modes)) ST.modes = o.modes.filter(k => Object.hasOwn(MODES, k));
+} catch {}
+function saveStats() { try { localStorage.setItem('burpOperaStats', JSON.stringify(ST)); } catch {} }
+const inMode = (k, lv) => M === MODES[k] && S.level >= lv;
+const castsPlayed = () => Object.keys(castPlays()).length;
+// [id, name, what you did, test, progress (current, goal) for counted ones]
+const TROPHIES = [
+  ['pop1', 'First Burp', 'Pop your first singer.', () => ST.pops >= 1],
+  ['pop100', 'Century Croak', 'Pop 100 singers.', () => ST.pops >= 100, () => [ST.pops, 100]],
+  ['pop1k', 'Thousand Belches', 'Pop 1,000 singers.', () => ST.pops >= 1000, () => [ST.pops, 1000]],
+  ['pop5k', 'Burp Machine', 'Pop 5,000 singers.', () => ST.pops >= 5000, () => [ST.pops, 5000]],
+  ['pop10k', 'Legend of Gas', 'Pop 10,000 singers.', () => ST.pops >= 10000, () => [ST.pops, 10000]],
+  ['combo10', 'Combo Starter', 'Get a 10 combo.', () => S.maxCombo >= 10],
+  ['combo25', 'Hot Streak', 'Get a 25 combo.', () => S.maxCombo >= 25],
+  ['combo50', 'Unstoppable', 'Get a 50 combo.', () => S.maxCombo >= 50],
+  ['combo100', 'Combo King', 'Get a 100 combo.', () => S.maxCombo >= 100],
+  ['duet', 'Duet', 'Pop 2 singers with one burp.', () => (S.bestMulti || 0) >= 2],
+  ['trio', 'Trio', 'Pop 3 singers with one burp.', () => (S.bestMulti || 0) >= 3],
+  ['lv5', 'Opening Act', 'Reach level 5.', () => S.level >= 5],
+  ['lv10', 'Rising Star', 'Reach level 10.', () => S.level >= 10],
+  ['lv25', 'Headliner', 'Reach level 25.', () => S.level >= 25],
+  ['lv50', 'Halfway Hero', 'Reach level 50.', () => S.level >= 50],
+  ['lv75', 'Encore Machine', 'Reach level 75.', () => S.level >= 75],
+  ['win', 'The Fat Lady Sang', 'Clear every level in any mode.', () => S.won],
+  ['boss1', 'Boss Burper', 'Beat a boss.', () => ST.bosses >= 1],
+  ['boss5', 'Boss Rush', 'Beat 5 bosses in one game.', () => S.bossesBeaten >= 5],
+  ['boss25', 'Boss Collector', 'Beat 25 bosses.', () => ST.bosses >= 25, () => [ST.bosses, 25]],
+  ['boss100', 'Boss Hunter', 'Beat 100 bosses.', () => ST.bosses >= 100, () => [ST.bosses, 100]],
+  ['diva', 'Diva Slayer', 'Beat the secret Diva Supreme (Crazy Expert, no hits).', () => S.secretBeaten],
+  ['pow1', 'Soda Pop', 'Grab a power-up.', () => ST.pows >= 1],
+  ['powall', 'Full Fridge', 'Grab all 6 kinds of power-up.', () => ST.powKinds.length >= POW_KEYS.length, () => [ST.powKinds.length, POW_KEYS.length]],
+  ['pow50', 'Soda Fan', 'Grab 50 power-ups.', () => ST.pows >= 50, () => [ST.pows, 50]],
+  ['shield', 'Bubble Buddy', 'Let a shield save you.', () => S.shieldSaved],
+  ['fever', 'Fever Pitch', 'Start Fever Mode (20 combo in Teen).', () => S.feverHit],
+  ['s10k', '10K Club', 'Score 10,000 in one game.', () => S.score >= 10000],
+  ['s100k', '100K Club', 'Score 100,000 in one game.', () => S.score >= 100000],
+  ['s1m', 'Millionaire Croaker', 'Score 1,000,000 in one game.', () => S.score >= 1000000],
+  ['sharp', 'Sharpshooter', '90% hits after 50 burps in one game.', () => S.shots >= 50 && S.landed / S.shots >= 0.9],
+  ['perfect', 'Perfect Pitch', 'Reach level 5 without a miss.', () => S.level >= 5 && !S.misses],
+  ['untouch', 'Untouchable', 'Reach level 10 without getting hit.', () => S.level >= 10 && S.flawless],
+  ['kid', 'Little Star', 'Reach level 10 in Little Burper.', () => inMode('kid', 10)],
+  ['teen', 'Teen Idol', 'Reach level 10 in Teen.', () => inMode('teen', 10)],
+  ['adult', 'Grown-up Groove', 'Reach level 10 in Adult.', () => inMode('adult', 10)],
+  ['zen', 'Zen Frog', 'Reach level 20 in Adult Zen.', () => inMode('zen', 20)],
+  ['crazy', 'Crazy Brave', 'Reach level 10 in Crazy Expert.', () => inMode('crazy', 10)],
+  ['crazy50', 'Certified Crazy', 'Reach level 50 in Crazy Expert.', () => inMode('crazy', 50)],
+  ['modes', 'Mode Master', 'Play every mode.', () => ST.modes.length >= Object.keys(MODES).length, () => [ST.modes.length, Object.keys(MODES).length]],
+  ['cast3', 'Cast Party', 'Play with 3 different casts.', () => castsPlayed() >= 3, () => [castsPlayed(), 3]],
+  ['castall', 'Full House', 'Play with every cast.', () => castsPlayed() >= Object.keys(SETS).length, () => [castsPlayed(), Object.keys(SETS).length]],
+  ['8bit', 'Retro Burper', 'Play a game in 8-bit view.', () => S.view === '8bit'],
+  ['3d', 'Third Dimension', 'Play a game in 3D view.', () => S.view === '3d'],
+  ['dress', 'Dressed to Impress', 'Play with a new frog color and hat.', () => mode === 'play' && frogCol !== FROG_COLORS[0][1] && hatCol !== HAT_COLORS[0][1]],
+  ['rainbow', 'Over the Rainbow', 'Play as the Rainbow frog.', () => mode === 'play' && frogCol === 'rainbow'],
+  ['crown', 'Royal Burp', 'Play wearing the Crown.', () => mode === 'play' && hatCol === 'crown'],
+  ['gas', 'Too Much Gas!', 'Puff up so much you get dizzy.', () => S.gas],
+  ['chaos5', 'Chaos Survivor', 'Live through 5 chaos events in one game.', () => (S.chaosCount || 0) >= 5],
+  ['games50', 'Opera Regular', 'Play 50 games.', () => ST.games >= 50, () => [ST.games, 50]],
+];
+let trophies = {}, trSeen = 0;
+try {
+  const o = JSON.parse(localStorage.getItem('burpOperaTrophies') || '{}');
+  for (const t of TROPHIES) { const v = Number(o && o[t[0]]); if (Number.isFinite(v) && v > 0) trophies[t[0]] = v; }
+  const n = Math.floor(Number(localStorage.getItem('burpOperaTrophySeen'))); if (Number.isFinite(n) && n > 0) trSeen = n;
+} catch {}
+const trCount = () => Object.keys(trophies).length;
+function trBadge() { $('trDot').hidden = trCount() <= trSeen; }
+function checkTrophies() {
+  if (mode !== 'play' && mode !== 'over') return;
+  let got = 0;
+  for (const [id, name, , test] of TROPHIES) {
+    if (trophies[id]) continue;
+    let ok = false; try { ok = !!test(); } catch { ok = false; }
+    if (!ok) continue;
+    trophies[id] = Date.now(); got++;
+    (S.newTrophies ||= []).push(name);
+    S.toasts.push({ text: '🥇 TROPHY: ' + name.toUpperCase(), left: 3.6 });
+  }
+  if (!got) return;
+  try { localStorage.setItem('burpOperaTrophies', JSON.stringify(trophies)); } catch {}
+  saveStats();
+  [784, 988, 1175, 1568].forEach((f, i) => setTimeout(() => blip(f, 0.18, 'triangle', 0.12, 1.2), i * 90));
+  trBadge();
+}
+let trFilter = 'all', trFresh = new Set();
+function renderTrophies() {
+  const n = trCount();
+  $('trGot').textContent = n; $('trTotal').textContent = TROPHIES.length;
+  $('trFill').style.width = (n / TROPHIES.length * 100) + '%';
+  for (const b of document.querySelectorAll('.tr-filter')) b.setAttribute('aria-pressed', String(b.dataset.f === trFilter));
+  const rows = [];
+  for (const [id, name, what, , prog] of TROPHIES) {
+    const won = !!trophies[id];
+    if ((trFilter === 'got' && !won) || (trFilter === 'todo' && won)) continue;
+    const li = document.createElement('li');
+    li.className = 'tr-card' + (won ? ' got' : '') + (trFresh.has(id) ? ' fresh' : '');
+    li.setAttribute('aria-label', name + (won ? ', won' : ', not won yet') + '. ' + what);
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'), use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    svg.setAttribute('viewBox', '0 0 64 64'); svg.setAttribute('aria-hidden', 'true'); use.setAttribute('href', '#trophy'); svg.append(use);
+    const nm = document.createElement('span'); nm.className = 'tr-name'; nm.textContent = name;
+    const ds = document.createElement('span'); ds.className = 'tr-desc'; ds.textContent = what;
+    li.append(svg, nm, ds);
+    if (won) {
+      const d = document.createElement('span'); d.className = 'tr-date';
+      d.textContent = '★ ' + new Date(trophies[id]).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      li.append(d);
+      if (trFresh.has(id)) { const t = document.createElement('span'); t.className = 'tr-new'; t.textContent = 'NEW'; li.append(t); }
+    } else if (prog) {
+      let cur = 0, goal = 1; try { [cur, goal] = prog(); } catch {}
+      cur = Math.min(cur, goal);
+      const bar = document.createElement('span'); bar.className = 'tr-prog'; const f = document.createElement('i'); f.style.width = (cur / goal * 100) + '%'; bar.append(f);
+      const num = document.createElement('span'); num.className = 'tr-num'; num.textContent = cur.toLocaleString() + ' / ' + goal.toLocaleString();
+      li.append(bar, num);
+    }
+    rows.push(li);
+  }
+  $('trGrid').replaceChildren(...rows);
+}
+function openTrophies() {
+  // trophies won since the last visit get a NEW tag this time
+  trFresh = new Set(Object.entries(trophies).sort((a, b) => b[1] - a[1]).slice(0, Math.max(0, trCount() - trSeen)).map(([id]) => id));
+  trSeen = trCount(); try { localStorage.setItem('burpOperaTrophySeen', String(trSeen)); } catch {}
+  trBadge(); trFilter = 'all'; renderTrophies();
+  $('trPop').hidden = false; $('trGrid').scrollTop = 0; $('trClose').focus({ preventScroll: true });
+  blip(660, 0.1, 'triangle', 0.1, 1.5);
+}
+function closeTrophies() { $('trPop').hidden = true; }
+$('trOpen1').onclick = openTrophies; $('trOpen2').onclick = openTrophies; $('trClose').onclick = closeTrophies;
+$('trPop').addEventListener('pointerdown', e => { if (e.target.id === 'trPop') closeTrophies(); });
+for (const b of document.querySelectorAll('.tr-filter')) b.onclick = () => { trFilter = b.dataset.f; renderTrophies(); };
+trBadge();
+
 // ---------- world leaderboards, shared through the artifact's database ----------
 // daily boards per skill level change over at 1:00 AM Eastern; each finished day's best move onto the all-time boards
 const LB_MODES = ['teen', 'adult', 'crazy'], LB_TZ = 'America/New_York';
