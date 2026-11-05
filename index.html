@@ -104,7 +104,59 @@ button.go.hold .lbl { position: relative; }
   background: var(--plum); border: 3px solid var(--tang); border-radius: 22px; padding: 20px 18px;
   display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; max-width: 560px; box-sizing: border-box; box-shadow: 0 12px 0 rgba(0,0,0,.25);
 }
-#frogPreview { width: min(260px, 66vw); height: min(260px, 66vw); border-radius: 16px; cursor: default; }
+#frogPreview { width: min(200px, 50vw, 26vh); height: min(200px, 50vw, 26vh); border-radius: 16px; cursor: default; flex: none; }
+/* front page: title, frog, one how-to line, Play, then Mode + Wardrobe */
+#title { gap: clamp(8px, 2vh, 18px); }
+.title-frog { width: clamp(110px, 20vh, 190px); height: clamp(110px, 20vh, 190px); flex: none; cursor: default; pointer-events: none; }
+.how1 { font-family: var(--hud); color: var(--cyan); font-size: clamp(.9rem, 3.6vw, 1.15rem); margin: 0; }
+.how1 b { color: var(--ink); font-weight: 400; }
+#title.resuming .how1 { display: none; }
+button.go.play-btn { width: min(360px, 86vw); font-size: clamp(1.5rem, 6.5vw, 2rem); padding-block: 18px; }
+@media (prefers-reduced-motion: no-preference) { button.go.play-btn { animation: playbob 2.4s ease-in-out infinite; } @keyframes playbob { 50% { transform: translateY(-3px); } } }
+.title-row { display: flex; gap: 10px; width: min(360px, 86vw); }
+.chip-pick { flex: 1 1 0; min-width: 0; position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; font-family: var(--hud); color: var(--ink);
+  background: rgba(26,11,46,.65); border: 2px solid var(--tang); border-radius: 14px; padding: 8px 8px 10px; cursor: pointer; font-size: .95rem; }
+.chip-pick > span { font-size: .65rem; color: var(--tang); letter-spacing: .08em; text-transform: uppercase; }
+.chip-pick b { font-weight: 400; }
+.chip-pick select { font-family: var(--hud); font-size: .95rem; color: var(--ink); background: transparent; border: 0; text-align: center; text-align-last: center; cursor: pointer; max-width: 100%; padding: 0 4px; }
+.chip-pick select option { background: var(--plum); }
+.chip-pick:hover { background: rgba(26,11,46,.85); }
+.chip-pick:focus-within, .chip-pick:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+.dot { position: absolute; top: -5px; right: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 3px var(--plum), 0 0 14px var(--cyan); }
+@media (prefers-reduced-motion: no-preference) { .dot { animation: dotpulse 1.1s ease-in-out infinite; } @keyframes dotpulse { 50% { transform: scale(1.3); } } }
+.corner-btn { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); z-index: 2; }
+/* wardrobe */
+.wardrobe { gap: 12px; max-width: 460px; }
+.wr-tabs { display: flex; gap: 6px; width: 100%; }
+.wr-tab { flex: 1; position: relative; font-family: var(--hud); font-size: .85rem; color: var(--dim); background: rgba(59,15,79,.7); border: 0; border-radius: 10px; padding: 9px 0; cursor: pointer; }
+.wr-tab[aria-selected="true"] { background: var(--tang); color: var(--plum); }
+.wr-tab:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+.wr-panel { width: 100%; display: flex; flex-direction: column; gap: 10px; min-height: 150px; }
+.wr-looks { display: flex; gap: 8px; justify-content: center; }
+.wr-look { font-family: var(--hud); font-size: .85rem; color: var(--ink); background: transparent; border: 2px solid var(--line, #4a2a63); border-radius: 999px; padding: 6px 16px; cursor: pointer; }
+.wr-look[aria-pressed="true"] { border-color: var(--cyan); color: var(--cyan); }
+.wr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 10px; padding: 4px; }
+.wr-grid.tiles { grid-template-columns: repeat(3, 1fr); }
+.wr-sw { position: relative; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); cursor: pointer; padding: 0; font-family: var(--hud); color: #fff; font-size: .8rem; }
+.wr-tile { position: relative; aspect-ratio: 1; border-radius: 12px; border: 2px solid rgba(255,255,255,.18); background: rgba(59,15,79,.7); cursor: pointer; padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: var(--hud); font-size: .62rem; color: var(--ink); line-height: 1.15; }
+.wr-tile canvas { width: 70%; height: 62%; pointer-events: none; cursor: inherit; }
+.wr-tile .ico { font-size: 1.6rem; line-height: 1; }
+.wr-sw.sel, .wr-tile.sel { outline: 3px solid var(--ink); outline-offset: 3px; }
+.wr-tile.sel { border-color: var(--tang); }
+.wr-sw.lock, .wr-tile.lock { cursor: not-allowed; }
+.wr-sw.lock { filter: grayscale(.7) brightness(.5); }
+.wr-tile.lock > :not(.lv) { opacity: .3; filter: grayscale(.8); }
+.wr-sw .lv { position: absolute; inset: 0; display: grid; place-items: center; text-shadow: 0 1px 2px #000; }
+.wr-tile .lv { font-size: .62rem; color: var(--tang); }
+.wr-sw.new, .wr-tile.new { box-shadow: 0 0 0 3px var(--cyan), 0 0 16px var(--cyan); }
+.wr-sw.nope, .wr-tile.nope { animation: nope .3s; }
+@keyframes nope { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.wr-sw:focus-visible, .wr-tile:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+.wr-note { font-family: var(--hud); font-size: .7rem; color: var(--dim); margin: 0; }
+body.pixel .chip-pick, body.pixel .wr-tab, body.pixel .wr-tile, body.pixel .wr-look { border-radius: 0; }
+body.pixel .how1, body.pixel .chip-pick, body.pixel .wr-tab, body.pixel .wr-tile, body.pixel .wr-note, body.pixel .wr-look { font-size: clamp(.5rem, 2vw, .7rem); line-height: 1.6; }
+body.pixel .chip-pick select { font-size: .65rem; }
+body.pixel button.go.play-btn { font-size: clamp(.9rem, 4vw, 1.3rem); }
 button.go.alt { background: var(--cyan); box-shadow: 0 6px 0 #1f9fb0; }
 button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
 .picks { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 18px; }
@@ -124,27 +176,17 @@ button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
   </div>
 
   <div class="overlay" id="title">
+    <button class="chip-btn lb-btn corner-btn" id="lbOpen1" type="button" aria-label="World leaderboards">🏆 Top 10</button>
     <p class="tag">Tonight only · a frog in a top hat</p>
     <h1>Burp<br>Opera</h1>
-    <div class="how">
-      <span class="step"><b>Hold</b> to inflate</span>
-      <span class="step"><b>Let go</b> to burp</span>
-      <span class="step">Match the <b>ghost's height</b></span>
-      <span class="step">Burp <b>soda cans</b> for power-ups</span>
-    </div>
-    <div class="picks">
-      <label class="pick" for="setPick">Burp at <select id="setPick"></select></label>
-      <label class="pick" for="frogPick">Frog <select id="frogPick"></select></label>
-      <label class="pick" for="hatPick">Hat <select id="hatPick"></select></label>
-      <label class="pick" for="stylePick">Look <select id="stylePick"></select></label>
-      <label class="pick" for="modePick">Mode <select id="modePick"></select></label>
-      <label class="pick" for="viewPick">View <select id="viewPick"><option value="3d">3D stage</option><option value="2d">Classic 2D</option><option value="8bit">8-bit 2D</option></select></label>
-    </div>
-    <p class="small unlock-hint" id="nextUnlock"></p>
-    <button class="chip-btn lb-btn" id="lbOpen1" type="button">World leaderboards</button>
+    <canvas id="titleFrog" class="title-frog" aria-hidden="true"></canvas>
+    <p class="how1"><b>Hold</b> to puff · <b>let go</b> to burp</p>
     <button class="go alt" id="resumeTitle" type="button" hidden>Back to my game</button>
-    <button class="go" id="play" type="button">Raise the curtain</button>
-    <p class="small">Mouse, touch, or spacebar. Little Burper is gentle, Crazy Expert is wild.</p>
+    <button class="go play-btn" id="play" type="button">▶ Play</button>
+    <div class="title-row">
+      <label class="chip-pick" for="modePick"><span>Mode</span><select id="modePick"></select></label>
+      <button class="chip-pick wr-btn" id="wardrobeBtn" type="button" aria-label="Wardrobe: change your frog, hat, cast and view"><span>Dress up</span><b>🎩 Wardrobe</b><i class="dot" id="wrDot" hidden></i></button>
+    </div>
   </div>
 
   <div class="overlay" id="paused" hidden>
@@ -172,15 +214,27 @@ button.go.alt:active { box-shadow: 0 2px 0 #1f9fb0; }
   </div>
 
   <div class="overlay" id="frogPop" hidden role="dialog" aria-modal="true" aria-labelledby="popTitle">
-    <div class="pop">
-      <p class="tag" id="popTitle">Meet your frog</p>
+    <div class="pop wardrobe">
+      <p class="tag" id="popTitle">Wardrobe</p>
       <canvas id="frogPreview" aria-label="Your frog in the colors you picked"></canvas>
-      <div class="picks">
-        <label class="pick" for="popStyle">Look <select id="popStyle"></select></label>
-        <label class="pick" for="popFrog">Frog <select id="popFrog"></select></label>
-        <label class="pick" for="popHat">Hat <select id="popHat"></select></label>
+      <div class="wr-tabs" role="tablist" aria-label="What to change">
+        <button class="wr-tab" type="button" role="tab" data-tab="frog">Frog<i class="dot" hidden></i></button>
+        <button class="wr-tab" type="button" role="tab" data-tab="hat">Hat<i class="dot" hidden></i></button>
+        <button class="wr-tab" type="button" role="tab" data-tab="set">Cast<i class="dot" hidden></i></button>
+        <button class="wr-tab" type="button" role="tab" data-tab="view">View<i class="dot" hidden></i></button>
       </div>
-      <button class="go alt" id="popDone" type="button">Looks great!</button>
+      <div class="wr-panel" id="wrPanel" role="tabpanel"></div>
+      <div hidden>
+        <select id="setPick" aria-hidden="true" tabindex="-1"></select>
+        <select id="frogPick" aria-hidden="true" tabindex="-1"></select>
+        <select id="hatPick" aria-hidden="true" tabindex="-1"></select>
+        <select id="stylePick" aria-hidden="true" tabindex="-1"></select>
+        <select id="viewPick" aria-hidden="true" tabindex="-1"><option value="3d">3D stage</option><option value="2d">Classic 2D</option><option value="8bit">8-bit 2D</option></select>
+        <select id="popStyle" aria-hidden="true" tabindex="-1"></select>
+        <select id="popFrog" aria-hidden="true" tabindex="-1"></select>
+        <select id="popHat" aria-hidden="true" tabindex="-1"></select>
+      </div>
+      <button class="go alt" id="popDone" type="button">✓ Looks good</button>
     </div>
   </div>
 
@@ -370,6 +424,8 @@ const FINALE = { id: 'fatlady', name: 'The Fat Lady', base: 'valkyrie', c: C.tan
   move(b) { b.p = 0.5 + Math.sin(b.ph * 0.7) * 0.28 + Math.sin(b.ph * 2.3) * 0.05; } };
 
 let mode = 'title', S;
+let taught = false, canTaught = false;
+try { taught = localStorage.getItem('burpOperaTaught') === '1'; canTaught = localStorage.getItem('burpOperaCanTaught') === '1'; } catch {}
 const CHEERS = ['BRAVO!', 'BELLISSIMO!', 'MAGNIFICO!', 'ENCORE!', 'OOF, DIVINE', 'MAMMA MIA', 'GASSY GENIUS', 'FORTISSIMO!'];
 const CHAOS = [
   { id: 'flip', name: 'UPSIDE-DOWN ACT' },
@@ -468,6 +524,7 @@ function start() {
   audio(); newGame(); mode = 'play';
   if (M.daily) S.banner.top = "Today's challenge · " + new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   countCastPlay(); paused = false; inMenu = false;
+  S.teach = taught ? 0 : 5;
   $('title').hidden = true; $('over').hidden = true; $('paused').hidden = true; $('resumeTitle').hidden = true; $('title').classList.remove('resuming');
   setButtons(); swoop('intro');
   blip(300, 0.15, 'square', 0.1, 2); setTimeout(() => blip(600, 0.2, 'square', 0.1, 1.5), 120);
@@ -1603,7 +1660,9 @@ function spawnItem() {
   const wt = { double: 3, triple: 1.6, mega: 1.6, spicy: 1.6, slow: 1.4, shield: S.lives <= 2 ? 3 : 1.2 };
   let r = srand() * POW_KEYS.reduce((a, k) => a + wt[k], 0), kind = 'double';
   for (const k of POW_KEYS) { r -= wt[k]; if (r <= 0) { kind = k; break; } }
-  S.items.push({ kind, x: W + 30, p: 0.2 + srand() * 0.6, ph: Math.random() * 6, r: 22, flee: 0, got: false });
+  const teach = !canTaught;
+  if (teach) { canTaught = true; try { localStorage.setItem('burpOperaCanTaught', '1'); } catch {} }
+  S.items.push({ kind, x: W + 30, p: 0.2 + srand() * 0.6, ph: Math.random() * 6, r: 22, flee: 0, got: false, teach });
 }
 function updateItems(dt) {
   S.powT -= dt;
@@ -1650,6 +1709,16 @@ function drawItem(it) {
   ctx.restore();
   ctx.fillStyle = 'rgba(255,255,255,.85)';
   for (let i = 0; i < 3; i++) { const t = (it.ph * 0.5 + i / 3) % 1; ctx.beginPath(); ctx.arc(it.x + Math.sin(i * 3 + it.ph) * 6, y - r - t * 30, 2 + (1 - t) * 2, 0, 7); ctx.fill(); }
+  if (it.teach && !it.flee) {
+    const by = y - r - 62 + Math.sin(it.ph * 2) * 4;
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+    ctx.font = '400 22px Bungee, Impact, sans-serif'; ctx.lineWidth = 6; ctx.strokeStyle = C.plum;
+    ctx.strokeText('BURP ME!', it.x, by); ctx.fillStyle = P.c; ctx.fillText('BURP ME!', it.x, by);
+    ctx.font = '400 12px Bungee, Impact, sans-serif'; ctx.lineWidth = 4;
+    ctx.strokeText('= POWER-UP', it.x, by + 20); ctx.fillStyle = '#ffffff'; ctx.fillText('= POWER-UP', it.x, by + 20);
+    ctx.fillStyle = P.c; ctx.beginPath(); ctx.moveTo(it.x - 8, by + 32); ctx.lineTo(it.x + 8, by + 32); ctx.lineTo(it.x, by + 42); ctx.fill();
+    ctx.restore();
+  }
 }
 // ---------- frog and hat colors, picked on the title screen ----------
 const FROG_COLORS = [['Classic Green', '#6fdc5a'], ['Bubblegum Pink', '#ff8cc6'], ['Sky Blue', '#5ab8ff'], ['Grape Purple', '#a77bff'], ['Tangerine', '#ffa24a'],
@@ -1823,6 +1892,7 @@ function update(dt) {
   if (S.freeze > 0) { S.freeze -= dt; return; }
   if (S.slowmo > 0) { S.slowmo -= dt; dt *= 0.35; }
   if (S.intro) { S.intro.left -= dt; if (S.intro.left <= 0) S.intro = null; }
+  if (S.teach > 0) { S.teach -= dt; if (S.teach <= 0) { S.teach = 0; taught = true; try { localStorage.setItem('burpOperaTaught', '1'); } catch {} } }
   if (S.fever > 0) S.fever -= dt;
   const slow = (chaosOn('slow') ? 0.5 : 1) * (has('slow') ? 0.45 : 1) * (chaosOn('speed') ? 2 : 1);
   const gdt = dt * slow;
@@ -2812,16 +2882,20 @@ function drawFrog(pv) {
 
 // the "meet your frog" pop-up preview
 const pvCv = $('frogPreview');
-function drawPreview() {
-  const dp = Math.min(window.devicePixelRatio || 1, 2), w = pvCv.clientWidth, h = pvCv.clientHeight;
+const tfCv = $('titleFrog');
+function drawPreview(cvs = pvCv, backdrop = true) {
+  const dp = Math.min(window.devicePixelRatio || 1, 2), w = cvs.clientWidth, h = cvs.clientHeight;
   if (!w || !h) return;
-  if (pvCv.width !== Math.round(w * dp) || pvCv.height !== Math.round(h * dp)) { pvCv.width = Math.round(w * dp); pvCv.height = Math.round(h * dp); }
-  const main = ctx; ctx = pvCv.getContext('2d');
+  if (cvs.width !== Math.round(w * dp) || cvs.height !== Math.round(h * dp)) { cvs.width = Math.round(w * dp); cvs.height = Math.round(h * dp); }
+  const main = ctx; ctx = cvs.getContext('2d');
   try {
   ctx.setTransform(dp, 0, 0, dp, 0, 0);
+  if (!backdrop) { ctx.clearRect(0, 0, w, h); ctx.fillStyle = 'rgba(255,214,90,.22)'; ctx.beginPath(); ctx.ellipse(w / 2, h * 0.9, w * 0.36, 10, 0, 0, 7); ctx.fill(); }
+  else {
   const g = ctx.createRadialGradient(w / 2, h * 0.45, 10, w / 2, h * 0.45, h * 0.75); g.addColorStop(0, '#6a2f8a'); g.addColorStop(1, '#1a0b2e');
   ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = 'rgba(255,214,90,.22)'; ctx.beginPath(); ctx.ellipse(w / 2, h * 0.9, w * 0.36, 12, 0, 0, 7); ctx.fill();
+  }
   const s = Math.min(w, h) / 175;
   ctx.save(); ctx.scale(s, s); drawFrog({ x: w / 2 / s - 8, gy: h * 0.9 / s, p: (Math.sin(clock * 2.2) + 1) * 0.22 }); ctx.restore();
   } finally { ctx = main; }
@@ -2889,7 +2963,20 @@ function aimTarget() {
   const y = pitchY(Math.min(1, S.pitch));
   return S.ghosts.find(g => !g.dead && !g.decoy && g.alpha > 0.5 && Math.abs(pitchY(g.p) - y) < g.r + 14) || null;
 }
+function drawTeach() {
+  if (!(S.teach > 0) || paused) return;
+  const a = Math.min(1, S.teach * 2, (5 - S.teach) * 4), held = S.holding;
+  const pulse = reduce ? 1 : held ? 1 + Math.min(0.5, S.pitch * 0.6) : 1 + Math.sin(clock * 7) * 0.1;
+  ctx.save(); ctx.globalAlpha = a; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.translate(W / 2, H * 0.6); ctx.scale(pulse, pulse);
+  ctx.font = '400 ' + (W < 500 ? 44 : 72) + 'px Bungee, Impact, sans-serif';
+  ctx.lineWidth = W < 500 ? 8 : 12; ctx.strokeStyle = C.plum; ctx.lineJoin = 'round';
+  const word = held ? 'LET GO!' : 'HOLD…';
+  ctx.strokeText(word, 0, 0); ctx.fillStyle = held ? C.tang : C.frog; ctx.fillText(word, 0, 0);
+  ctx.restore();
+}
 function drawKidCues() {
+  if (S.teach > 0) return;
   if (M !== MODES.kid || S.level > 2 || S.hits >= 6 || paused) return;
   const fx = frogX() + 70, fy = groundY() - 150, pulse = 1 + Math.sin(clock * 6) * 0.12;
   ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.translate(fx, fy); ctx.scale(pulse, pulse);
@@ -3474,7 +3561,7 @@ function render3D() {
   for (const z of S.hazards) drawHazard(z);
   drawBoss();
   for (const w of S.waves) drawWave(w);
-  drawFrog();
+  if (mode !== 'title') drawFrog();
   for (const p of S.parts) { ctx.save(); ctx.globalAlpha = Math.min(1, p.life); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.c; ctx.fillRect(-p.sz / 2, -p.sz / 4, p.sz, p.sz / 2); ctx.restore(); }
   drawFx();
   ctx.globalAlpha = 1;
@@ -3522,7 +3609,7 @@ function render3D() {
   if (S.hurtFlash > 0) { ctx.fillStyle = `rgba(255,30,50,${S.hurtFlash * 0.35})`; ctx.fillRect(0, 0, W, H); }
   if (has('slow') && !reduce) { ctx.fillStyle = 'rgba(199,139,255,.12)'; ctx.fillRect(0, 0, W, H); }
   drawLightsOut(); drawFever();
-  if (mode === 'play' && !paused) drawHUD();
+  if (mode === 'play' && !paused) { drawHUD(); drawTeach(); }
   if (S.disco > 0 && !reduce) { ctx.fillStyle = `hsla(${(clock * 900) % 360},100%,60%,${S.disco * 0.3})`; ctx.fillRect(0, 0, W, H); }
   if (S.flash > 0 && !reduce) { ctx.fillStyle = `rgba(255,79,163,${S.flash * 0.25})`; ctx.fillRect(0, 0, W, H); }
   // a gentle tip if this device struggles with 3D
@@ -3531,6 +3618,7 @@ function render3D() {
     if (g3.slowFor > 4 && !g3.tipShown) { g3.tipShown = true; say(W / 2, H * 0.55, 'TIP: CLASSIC 2D RUNS FASTER HERE (MENU)', C.ink, 14); }
   }
   if (!$('frogPop').hidden) drawPreview();
+  if (!$('title').hidden && !$('title').classList.contains('resuming')) drawPreview(tfCv, false);
 }
 
 function setView(v) {
@@ -3653,7 +3741,7 @@ function render() {
   for (const z of S.hazards) drawHazard(z);
   drawBoss();
   for (const w of S.waves) drawWave(w);
-  drawFrog();
+  if (mode !== 'title') drawFrog();
   for (const p of S.parts) {
     ctx.save(); ctx.globalAlpha = Math.min(1, p.life); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
     ctx.fillStyle = p.c; ctx.fillRect(-p.sz / 2, -p.sz / 4, p.sz, p.sz / 2); ctx.restore();
@@ -3677,10 +3765,11 @@ function render() {
   if (S.hurtFlash > 0) { ctx.fillStyle = `rgba(255,30,50,${S.hurtFlash * 0.35})`; ctx.fillRect(0, 0, W, H); }
   if (has('slow') && !reduce) { ctx.fillStyle = 'rgba(199,139,255,.12)'; ctx.fillRect(0, 0, W, H); }
   drawLightsOut(); drawFever();
-  if (mode === 'play' && !paused) drawHUD();
+  if (mode === 'play' && !paused) { drawHUD(); drawTeach(); }
   if (S.disco > 0 && !reduce) { ctx.fillStyle = `hsla(${(clock * 900) % 360},100%,60%,${S.disco * 0.3})`; ctx.fillRect(0, 0, W, H); }
   if (S.flash > 0 && !reduce) { ctx.fillStyle = `rgba(255,79,163,${S.flash * 0.25})`; ctx.fillRect(0, 0, W, H); }
   if (!$('frogPop').hidden) drawPreview();
+  if (!$('title').hidden && !$('title').classList.contains('resuming')) drawPreview(tfCv, false);
 }
 
 // the cast picker, on the title screen and the curtain-call screen
@@ -3696,9 +3785,115 @@ for (const id of ['setPick', 'setPick2']) {
   el.replaceChildren(...Object.keys(SETS).map(k => new Option(SETS[k].label, k)));
   el.value = curSet; el.onchange = () => { if (!isUnlocked('set', el.value)) { el.value = curSet; return; } setSet(el.value); markSeen('set'); };
 }
-// frog look pickers: picking on the title screen pops up a big preview with the same pickers inside
-function openLook() { $('frogPop').hidden = false; $('popDone').focus({ preventScroll: true }); }
-function closeLook() { $('frogPop').hidden = true; }
+// ---------- wardrobe: tap-able swatches and cast tiles that drive the (hidden) pickers ----------
+const WR = { tab: 'frog', visited: new Set() };
+const WR_THUMB_TYPE = 'pumpkin'; // one familiar cast member stands in for each cast
+const thumbCache = {};
+function castThumb(k) {
+  if (thumbCache[k]) return thumbCache[k];
+  const c = document.createElement('canvas'), dp = Math.min(window.devicePixelRatio || 1, 2), sz = 64;
+  c.width = c.height = sz * dp; c.setAttribute('aria-hidden', 'true');
+  const main = ctx, keep = curSet;
+  try {
+    ctx = c.getContext('2d'); curSet = k;
+    ctx.setTransform(dp, 0, 0, dp, 0, 0); ctx.translate(sz / 2, sz / 2 + 2);
+    const r = 20, g = { x: 0, p: 0.5, ph: 1, sq: 0, hurt: 0, alpha: 1, r, type: WR_THUMB_TYPE, hp: 1, vx: 0 };
+    skin(WR_THUMB_TYPE).draw(g, r);
+  } catch { /* a missing drawing just leaves the tile with its name */ } finally { ctx = main; curSet = keep; }
+  return (thumbCache[k] = c);
+}
+const curView = () => view8 ? '8bit' : view3d ? '3d' : '2d';
+function wrList(tab) {
+  if (tab === 'frog') return FROG_COLORS.map(([n, v]) => ({ n, v, sel: v === frogCol }));
+  if (tab === 'hat') return HAT_COLORS.map(([n, v]) => ({ n, v, sel: v === hatCol }));
+  if (tab === 'set') return Object.keys(SETS).map(k => ({ n: SETS[k].label, v: k, sel: k === curSet }));
+  return [['Classic 2D', '2d', '🎭'], ['8-bit', '8bit', '👾'], ['3D', '3d', '🎬']].map(([n, v, ico]) => ({ n, v, ico, sel: v === curView() }));
+}
+const SELECT_FOR = { frog: 'frogPick', hat: 'hatPick', set: 'setPick', view: 'viewPick' };
+function pickFromWardrobe(cat, v) {
+  const el = $(SELECT_FOR[cat]); el.value = v; el.dispatchEvent(new window.Event('change'));
+}
+function swatchBg(v) {
+  if (v === 'rainbow') return 'conic-gradient(#ff5a5a,#ffe14d,#6fdc5a,#4ef0ff,#a77bff,#ff5a5a)';
+  if (v === 'crown') return 'radial-gradient(circle at 35% 30%, #fff3b0, #ffd21f 45%, #c99a00)';
+  return v;
+}
+function renderWardrobe() {
+  // badges first: the Wardrobe button and each tab glow while something new waits inside
+  let any = false;
+  for (const cat of ['frog', 'hat', 'set', 'view']) {
+    const fresh = wrList(cat).some(it => isNew(cat, it.v));
+    any ||= fresh;
+    const tab = document.querySelector('.wr-tab[data-tab="' + cat + '"]');
+    if (tab) { tab.querySelector('.dot').hidden = !fresh; tab.setAttribute('aria-selected', String(WR.tab === cat)); }
+  }
+  $('wrDot').hidden = !any;
+  $('wardrobeBtn').setAttribute('aria-label', 'Wardrobe: change your frog, hat, cast and view' + (any ? ' (new things unlocked!)' : ''));
+  if ($('frogPop').hidden) return;
+  const panel = $('wrPanel'), cat = WR.tab, kids = [];
+  if (cat === 'frog') {
+    const looks = document.createElement('div'); looks.className = 'wr-looks';
+    for (const [n, v] of FROG_STYLES) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'wr-look'; b.textContent = (v === 'girl' ? '🎀 ' : '🎩 ') + n.replace(' frog', '');
+      b.setAttribute('aria-pressed', String(frogStyle === v));
+      b.onclick = () => { const el = $('stylePick'); el.value = v; el.dispatchEvent(new window.Event('change')); renderWardrobe(); };
+      looks.append(b);
+    }
+    kids.push(looks);
+  }
+  const grid = document.createElement('div');
+  const round = cat === 'frog' || cat === 'hat';
+  grid.className = 'wr-grid' + (round ? '' : ' tiles');
+  for (const it of wrList(cat)) {
+    const lv = unlockLevel(cat, it.v), off = cat === 'view' && it.v === '3d' && g3failed;
+    const locked = lv > bestLevel || off;
+    const b = document.createElement('button'); b.type = 'button';
+    b.className = (round ? 'wr-sw' : 'wr-tile') + (it.sel ? ' sel' : '') + (locked ? ' lock' : '') + (isNew(cat, it.v) ? ' new' : '');
+    b.setAttribute('aria-pressed', String(it.sel));
+    b.setAttribute('aria-label', it.n + (off ? ', not available on this device' : locked ? ', unlocks at level ' + lv : isNew(cat, it.v) ? ', new' : ''));
+    b.title = it.n;
+    if (round) {
+      b.style.background = swatchBg(it.v);
+      if (it.v === 'crown') { const c = document.createElement('span'); c.className = 'lv'; c.textContent = '♛'; c.style.color = '#7a4a00'; b.append(c); }
+      if (locked) { const t = document.createElement('span'); t.className = 'lv'; t.textContent = off ? '✕' : lv; b.replaceChildren(t); }
+    } else {
+      if (cat === 'set') b.append(castThumb(it.v)); else { const ic = document.createElement('span'); ic.className = 'ico'; ic.textContent = it.ico; b.append(ic); }
+      const nm = document.createElement('span'); nm.textContent = it.n; b.append(nm);
+      if (locked) { const t = document.createElement('span'); t.className = 'lv'; t.textContent = off ? 'Not here' : 'Lv ' + lv; b.append(t); }
+    }
+    b.onclick = () => {
+      if (locked) { b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); blip(180, 0.12, 'square', 0.08, 0.8); return; }
+      pickFromWardrobe(cat, it.v); renderWardrobe();
+      const again = panel.querySelector('[aria-pressed="true"]' + (round ? '.wr-sw' : '.wr-tile')); if (again) again.focus({ preventScroll: true });
+    };
+    grid.append(b);
+  }
+  kids.push(grid);
+  const note = document.createElement('p'); note.className = 'wr-note';
+  note.textContent = nextUnlockText(cat);
+  kids.push(note);
+  panel.replaceChildren(...kids);
+}
+function setWardrobeTab(t) { WR.tab = t; WR.visited.add(t); renderWardrobe(); }
+for (const tab of document.querySelectorAll('.wr-tab')) tab.onclick = () => setWardrobeTab(tab.dataset.tab);
+function openLook(tab) {
+  $('frogPop').hidden = false;
+  if (tab) WR.tab = tab;
+  WR.visited.add(WR.tab); renderWardrobe();
+  const t = document.querySelector('.wr-tab[data-tab="' + WR.tab + '"]'); (t || $('popDone')).focus({ preventScroll: true });
+}
+function closeLook() {
+  $('frogPop').hidden = true;
+  // whatever you looked at is no longer "new"; the glow on Wardrobe goes away once everything new has been seen
+  for (const c of WR.visited) markSeen(c);
+  WR.visited.clear(); renderWardrobe();
+  if (!$('title').hidden) $('wardrobeBtn').focus({ preventScroll: true });
+}
+$('wardrobeBtn').onclick = () => {
+  // open on the first tab with something new in it
+  const fresh = ['frog', 'hat', 'set', 'view'].find(c => wrList(c).some(it => isNew(c, it.v)));
+  openLook(fresh || WR.tab); blip(660, 0.1, 'triangle', 0.1, 1.5);
+};
 $('popDone').onclick = closeLook;
 $('frogPop').addEventListener('pointerdown', e => { if (e.target.id === 'frogPop') closeLook(); });
 for (const g of [
@@ -3717,7 +3912,6 @@ for (const g of [
       for (const other of g.ids) $(other).value = el.value;
       if (g.cat) markSeen(g.cat);
       blip(660, 0.1, 'triangle', 0.1, 1.5);
-      if ($('frogPop').hidden) openLook();
     };
   }
 }
@@ -3732,9 +3926,9 @@ const PICKS = [
 ];
 const isNew = (cat, v) => isUnlocked(cat, v) && unlockLevel(cat, v) > 1 && !seenNew.has(cat + ':' + v);
 function itemName(cat, v) { const p = PICKS.find(q => q.cat === cat), it = p && p.list().find(([, x]) => x === v); return it ? it[0] : v; }
-function nextUnlockText() {
-  const next = Object.entries(UNLOCK_AT).filter(([, lv]) => lv > bestLevel).sort((a, b) => a[1] - b[1]);
-  if (!next.length) return 'Everything is unlocked!';
+function nextUnlockText(cat) {
+  const next = Object.entries(UNLOCK_AT).filter(([k, lv]) => lv > bestLevel && (!cat || k.startsWith(cat + ':'))).sort((a, b) => a[1] - b[1]);
+  if (!next.length) return cat ? 'All unlocked!' : 'Everything is unlocked!';
   const lv = next[0][1], names = next.filter(([, l]) => l === lv).map(([k]) => { const [c, v] = k.split(':'); return 'the ' + itemName(c, v) + ' ' + KIND[c]; });
   return 'Reach level ' + lv + ' to unlock ' + names.join(' and ') + '.';
 }
@@ -3751,7 +3945,7 @@ function refreshPicks() {
     }
     for (const id of p.ids) $(id).classList.toggle('has-new', fresh);
   }
-  $('nextUnlock').textContent = nextUnlockText();
+  renderWardrobe();
 }
 function markSeen(cat) {
   let changed = false;
@@ -3759,7 +3953,6 @@ function markSeen(cat) {
   if (changed) { try { localStorage.setItem('burpOperaSeen', JSON.stringify([...seenNew])); } catch {} refreshPicks(); }
 }
 // once a player has opened a glowing drop-down, its NEW stars go away
-for (const p of PICKS) for (const id of p.ids) $(id).addEventListener('blur', () => markSeen(p.cat));
 function reachLevel(lv) {
   const before = bestLevel; bestLevel = lv;
   try { localStorage.setItem('burpOperaBestLevel', String(bestLevel)); } catch {}
